@@ -16,8 +16,8 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom right, #ffdde1, #ee9ca7);
             overflow: hidden;
-            opacity: 0; /* Start hidden */
-            transition: opacity 1s ease; /* Fade-in effect */
+            opacity: 0;
+            transition: opacity 1s ease;
         }
 
         .container {
@@ -285,7 +285,6 @@
     </div>
 
     <script>
-        // Fade-in effect on page load
         window.onload = () => {
             document.body.style.opacity = "1";
         };
@@ -352,14 +351,12 @@
         setInterval(createLeaf, 750);
 
         function goBack() {
-            // Fade out all content
             document.body.style.opacity = "0";
             document.querySelector(".container").style.opacity = "0";
 
-            // After the fade-out completes (1s), navigate to the previous page
             setTimeout(() => {
                 window.location.href = "/index.html";
-            }, 1000);  // Wait for the fade to finish before redirecting
+            }, 1000);
         }
     </script>
 
