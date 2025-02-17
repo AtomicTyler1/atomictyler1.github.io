@@ -16,8 +16,8 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom right, #ffdde1, #ee9ca7);
             overflow: hidden;
-            opacity: 0; /* Initially hidden */
-            animation: fadeInBackground 2s forwards; /* Fade in background */
+            opacity: 0;
+            animation: fadeInBackground 2s forwards;
         }
 
         .container {
@@ -29,8 +29,8 @@
             max-width: 400px;
             position: relative;
             z-index: 10;
-            opacity: 0; /* Initially hidden */
-            animation: fadeInUI 1.5s 1s forwards; /* Fade in UI after 1 second */
+            opacity: 0;
+            animation: fadeInUI 1.5s 1s forwards;
         }
 
 
@@ -137,7 +137,6 @@
     </div>
 
     <script>
-        // Create leaf animations
         let leafInterval;
 
         function createLeaf() {
@@ -160,29 +159,24 @@
             }, duration * 1000);
         }
 
-        // Start the leaf falling after the background and UI are visible
         window.addEventListener('load', () => {
             setTimeout(() => {
-                leafInterval = setInterval(createLeaf, 750); // Start leaf animation
-            }, 3500); // Delay leaf start after UI fade-in
+                leafInterval = setInterval(createLeaf, 750);
+            }, 3500);
         });
 
-        // Handle button click
         document.getElementById('modButton').addEventListener('click', function(e) {
             e.preventDefault();
             const link = this.href;
 
-            // Stop leaf animations
             clearInterval(leafInterval);
 
-            // Apply fade-out effect to everything (both body and container)
             document.body.classList.add('fade-out');
             document.querySelector('.container').classList.add('fade-out');
 
-            // Wait for the fade-out animation to finish before navigating
             setTimeout(() => {
                 window.location.href = link;
-            }, 1000); // Wait 1 second (duration of fade-out)
+            }, 1000);
         });
     </script>
 
