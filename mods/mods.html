@@ -280,13 +280,39 @@
             </div>
 
             <a href="https://www.youtube.com/watch?v=uHgt8giw1LY" class="button">Don't like my mods?</a>
-
+            <a href="#" class="button" id="getTotalDownloadsBtn">Total Downloads</a>
             <a href="#" class="button" onclick="goBack()">Want to go back?</a>
 
         </div>
     </div>
 
     <script>
+
+        document.getElementById('getTotalDownloadsBtn').addEventListener('click', async () => {
+            try {
+                const apiUrls = [
+                    'https://thunderstore.io/api/v1/package-metrics/AtomicStudio/Better_Shotgun_Tooltip/',
+                    'https://thunderstore.io/api/v1/package-metrics/AtomicStudio/Moved_Magnet_Switch/',
+                    'https://thunderstore.io/api/v1/package-metrics/AtomicStudio/Atomics_Cosmetics/',
+                    'https://thunderstore.io/api/v1/package-metrics/AtomicStudio/Colorable_CozyLights/',
+                    'https://thunderstore.io/api/v1/package-metrics/AtomicStudio/Atomics_Suits/'
+                ];
+
+                let totalDownloads = 0;
+                
+                for (let url of apiUrls) {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    totalDownloads += data.downloads;
+                }
+
+                document.getElementById('totalDownloads').textContent = `Total Downloads: ${totalDownloads}`;
+            } catch (error) {
+                document.getElementById('totalDownloads').textContent = 'Error fetching data.';
+                console.error('Error fetching API data:', error);
+            }
+        });
+
         window.onload = () => {
             document.body.style.opacity = "1";
         };
@@ -361,6 +387,5 @@
             }, 1000);
         }
     </script>
-
 </body>
 </html>
