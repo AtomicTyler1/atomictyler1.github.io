@@ -98,6 +98,7 @@
             padding: 3px;
             overflow-y: auto;
             overflow-x: hidden;
+            scrollbar-base-color: 0,0,0,0;
             max-height: 0;
             opacity: 0;
             transform: translateY(-10px);
@@ -169,6 +170,17 @@
                 transform: translateY(100vh) rotate(360deg);
                 opacity: 0;
             }
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            width: 3px;
+            border-radius: 50%;
+            }
+            
+            .dropdown-content::-webkit-scrollbar-thumb {
+            background-color: white;
+            outline: 2px solid white;
+            border-radius: 2.5%;
         }
     </style>
 </head>
