@@ -2,6 +2,15 @@ window.onload = () => {
     document.body.style.opacity = "1";
 };
 
+function goBack() {
+    document.body.style.opacity = "0";
+    document.querySelector(".container").style.opacity = "0";
+
+    setTimeout(() => {
+        window.location.href = "/";
+    }, 1000);
+}
+
 function toggleDropdown(id, button) {
     const dev_2025 = document.getElementById('2025');
 
@@ -60,12 +69,3 @@ function createLeaf() {
 }
 
 setInterval(createLeaf, 750);
-
-function goBack() {
-    document.body.style.opacity = "0";
-    document.querySelector(".container").style.opacity = "0";
-
-    setTimeout(() => {
-        window.location.href = "https://atomictyler1.github.io";
-    }, 1000);
-}

@@ -28,6 +28,6 @@ function goBack() {
     document.body.style.opacity = "0";
     document.querySelector(".container").style.opacity = "0";
     setTimeout(() => {
-        window.location.href = "https://atomictyler1.github.io";
+        window.location.href = "/";
     }, 1000);
 }
