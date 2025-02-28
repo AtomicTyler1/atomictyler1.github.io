@@ -5,128 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atomic's Landing Page</title>
     <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #ffdde1, #ee9ca7);
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeInBackground 2s forwards;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            position: relative;
-            z-index: 10;
-            opacity: 0;
-            animation: fadeInUI 1.5s 1s forwards;
-        }
-
-
-        h1 {
-            font-size: 32px;
-            margin: 0;
-            color: #333;
-        }
-
-        p {
-            font-size: 18px;
-            margin-top: 10px;
-            color: #555;
-        }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .button {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            border: none;
-            padding: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            transition: background 0.3s;
-        }
-
-        .button:hover {
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .leaf {
-            position: absolute;
-            top: -50px;
-            left: 0;
-            width: 30px;
-            height: auto;
-            opacity: 0.8;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fadeInBackground {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeInUI {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-            }
-        }
-
-        .fade-out {
-            animation: fadeOut 1s forwards;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-50px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js"></script>
 </head>
 <body>
-
     <div class="container">
         <h1>Welcome! Enjoy your stay.</h1>
         <p>Can I interest you in any of these options?</p>
@@ -136,56 +18,8 @@
             <a href="socials/socials.html" class="button" id="socialsButton">My Socials</a>
             <a href="about/about.html" class="button" id="aboutButton">My About Me</a>
             <a href="resources/resources.html" class="button" id="resourceButton">My Common Resources</a>
+            <a href="devlog/devlog.html" class="button" id="devlogButton">My Devlog</a>
         </div>
     </div>
-
-    <script>
-        window.onload = () => {
-            let leafInterval;
-
-            function createLeaf() {
-                const leaf = document.createElement("img");
-                leaf.src = "images/icons/leaf.png";
-                leaf.classList.add("leaf");
-
-                leaf.style.left = Math.random() * window.innerWidth + "px";
-                const duration = Math.random() * 5 + 3;
-                leaf.style.animationDuration = duration + "s";
-
-                document.body.appendChild(leaf);
-
-                setTimeout(() => {
-                    leaf.classList.add("fade-out");
-
-                    setTimeout(() => {
-                        leaf.remove();
-                    }, 1000);
-                }, duration * 1000);
-            }
-
-            setTimeout(() => {
-                leafInterval = setInterval(createLeaf, 750);
-            }, 3500);
-
-            document.querySelectorAll(".button").forEach((button) => {
-                button.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    const link = this.href;
-
-                    clearInterval(leafInterval);
-
-                    document.body.classList.add("fade-out");
-                    document.querySelector(".container").classList.add("fade-out");
-
-                    document.body.style.pointerEvents = "none";
-
-                    setTimeout(() => {
-                        window.location.href = link;
-                    }, 1000);
-                });
-            });
-        };
-    </script>
-
 </body>
 </html>
