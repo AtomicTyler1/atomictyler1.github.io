@@ -2,7 +2,7 @@ window.onload = () => {
     document.body.style.opacity = "1";
     checkQuery();
     if ( SocialsDisabled === true ) {
-        window.location.href = "/404"+window.location.search;
+        window.location.href = "/404.html"+window.location.search;
     }
 };
 
