@@ -25,6 +25,15 @@ window.onload = () => {
         leafInterval = setInterval(createLeaf, 750);
     }, 3500);
 
+    function checkQuery() {
+        const queryString = window.location.search;
+        if (queryString.includes("disabled=true")) {
+            document.getElementById("socialsButton").remove();
+        }
+    }
+
+    checkQuery();
+
     document.querySelectorAll(".button").forEach((button) => {
         button.addEventListener("click", function (e) {
             e.preventDefault();
@@ -38,8 +47,9 @@ window.onload = () => {
             document.body.style.pointerEvents = "none";
 
             setTimeout(() => {
-                window.location.href = link;
+                window.location.href = link + window.location.search;
             }, 1000);
         });
     });
 };
+

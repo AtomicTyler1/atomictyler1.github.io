@@ -2,12 +2,29 @@ window.onload = () => {
     document.body.style.opacity = "1";
 };
 
+var SocialsDisabled = false;
+
+function checkQuery() {
+    const queryString = window.location.search;
+    if (queryString.includes("disabled=true")) {
+        SocialsDisabled = true;
+        console.log(SocialsDisabled+", it should be true now.")
+    }
+}
+
+checkQuery();
+
 function goBack() {
     document.body.style.opacity = "0";
     document.querySelector(".container").style.opacity = "0";
-
     setTimeout(() => {
-        window.location.href = "/";
+        checkQuery();
+        if ( SocialsDisabled === true ) {
+            window.location.href = "/"+window.location.search;
+        }
+        else {
+            window.location.href = "/"
+        }
     }, 1000);
 }
 
