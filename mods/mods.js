@@ -45,13 +45,7 @@ function updateUI(data) {
     document.getElementById("downloads").textContent = data.total_downloads.toLocaleString();
     document.getElementById("ratings").textContent = data.total_ratings.toLocaleString();
     document.getElementById("lastChecked").textContent = formattedDate + " (GMT)";
-
-    
 }
-
-fetchData().then(data => {
-    updateUI(data);
-});
 
 
 setInterval(async () => {
@@ -62,6 +56,9 @@ setInterval(async () => {
 
 window.onload = () => {
     document.body.style.opacity = "1";
+    fetchData().then(data => {
+        updateUI(data);
+    });
 };
 
 function toggleDropdown(id, button) {
