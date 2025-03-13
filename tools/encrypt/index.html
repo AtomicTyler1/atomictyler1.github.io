@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic's Encryptor</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico">
+    <link rel="stylesheet" href="encrypt.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Atomic's File Encryptor</h1>
+        <p>Encrypt and decrypt files using a password. This took a while.</p>
+        
+        <label for="fileInput" class="btn btn-primary btn-file">
+            Browse...
+        </label>
+        <input type="file" id="fileInput" style="display: none;" oninput="updateFileLabel()" multiple>
+        <p id="fileLabel"></p>
+
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Enter password" class="input">
+            <div class="button-row">
+                <button id="togglePassword" class="eye-button">
+                    <img src="/images/buttons/hidden.png" alt="Show password" class="eye-icon">
+                </button>
+                <button id="copyPassword" class="clipboard-button">
+                    <img src="/images/buttons/copy.png" alt="Copy password" class="clipboard-icon">
+                </button>
+                <button id="pastePassword" class="clipboard-button">
+                    <img src="/images/buttons/Paste.png" alt="Paste password" class="clipboard-icon">
+                </button>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="button" id="encryptBtn">Encrypt</button>
+            <button class="button" id="decryptBtn">Decrypt</button>
+            <a style="text-decoration:none" href="#" class="button" onclick="goBack()">Want to go back?</a>    
+        </div>
+        
+        <progress id="progressBar" value="0" max="100"></progress>
+    </div>
+    <script src="encrypt.js"></script>
+</body>
+</html>
