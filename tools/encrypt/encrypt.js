@@ -155,6 +155,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     loaderbar();
+
+    function generateRandomPassword() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let password = '';
+        const passwordLength = Math.floor(Math.random() * (32 - 24 + 1)) + 24;
+        for (let i = 0; i < passwordLength; i++) {
+            password += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return password;
+    }
+    
+    document.getElementById("generatePasswordBtn").addEventListener("click", () => {
+        const password = generateRandomPassword();
+        document.getElementById("password").value = password;
+    });
     
 });
 
