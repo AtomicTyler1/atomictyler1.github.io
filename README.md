@@ -15,7 +15,7 @@ If you want to contribute or modify the website locally:
 
 Clone the repository:
 ```
-git clone https://github.com/atomictyler1/Website.git
+git clone https://github.com/AtomicTyler1/atomictyler1.github.io.git
 ```
 Open index.html in your browser or use Live Website for a better experience.
 
