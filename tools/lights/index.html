@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorable Cozy Lights</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico">
+    <link rel="stylesheet" href="lights.css">
+    <script src="lights.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Colorable Cozy Light Animator!</h1>
+        <p>Easily make animation for Colorable Cozy Lights!</p>
+        <p>Use https://rgbacolorpicker.com for RGBA and ms is how long that colour will stay for.</p>
+        <div class="animator">
+            <h2>Animation Steps</h2>
+            <div id="animation-steps"></div>
+            <button onclick="addAnimationStep()" class="add-btn">+ Add New Animation</button>
+        
+            <div class="output-block">
+                <h3>Generated Output</h3>
+                <textarea id="output" readonly></textarea>
+                <div class="output-actions">
+                    <button class="copy-paste-button" onclick="copyToClipboard()">
+                        <img src="/images/buttons/copy.png" alt="Copy Icon"> Copy to Clipboard
+                    </button>
+                    <button class="copy-paste-button" onclick="pasteFromInput()">
+                        <img src="/images/buttons/Paste.png" alt="Paste Icon"> Paste Animation
+                    </button>
+                </div>
+            </div>
+        </div>        
+        <div class="button-container">
+            <a href="https://thunderstore.io/c/lethal-company/p/AtomicStudio/Colorable_CozyLights/" class="button">Colorable Cozy Lights</a>  
+            <a href="#" class="button" onclick="goBack()">Want to go back?</a>          
+        </div>        
+    </div>
+</body>
+</html>
