@@ -30,13 +30,27 @@ body {
     overflow-x: hidden;
 }
 
-.container::-webkit-scrollbar {
+.animation-steps {
+    max-height: 130px;
+    overflow-y: auto; 
+    overflow-x: hidden;         
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#output::-webkit-scrollbar,
+.animation-steps::-webkit-scrollbar {
     width: 2px;
     height: fit-content;
     border-radius: 50%;
 }
 
-.container::-webkit-scrollbar-thumb {
+#output::-webkit-scrollbar-thumb,
+.animation-steps::-webkit-scrollbar-thumb {
     background-color: rgb(255, 255, 255);
     outline: 2px solid rgb(255, 255, 255);
     border-radius: 2px;
@@ -63,6 +77,15 @@ p {
     margin-top: 20px;
 }
 
+.button-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
 .button {
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(10px);
@@ -79,7 +102,7 @@ p {
     justify-content: center;
     gap: 8px;
     transition: background 0.3s;
-    width: 100%;
+    width: 96%;
 }
 
 .button img {
@@ -98,11 +121,35 @@ p {
 }
 
 .anim-step {
+    position: relative;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     gap: 10px;
     justify-content: flex-start;
+}
+
+.anim-step::after {
+    content: "";
+    position: absolute;
+    height: 2px;
+    background-color: rgba(255, 81, 81, 0.432);
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+    pointer-events: none;
+}
+
+.anim-step:hover .trash:hover ~ .anim-step::after,
+.anim-step:hover .trash:hover + *::after {
+    transform: scaleX(1);
+}
+
+.anim-step:hover.trash-hover::after {
+    transform: scaleX(1);
 }
 
 .anim-step .input-group {
@@ -152,6 +199,10 @@ input {
     font-weight: bold;
 }
 
+.trash:hover {
+    color: transparent;  
+    text-shadow: 0 0 0 rgba(184, 0, 0, 0.486);
+}
 
 .anim-step label {
     font-size: 14px;
@@ -171,6 +222,7 @@ input {
     margin-top: 10px;
     padding: 8px 16px;
     font-weight: bold;
+    gap: 5px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -182,12 +234,30 @@ input {
     background: rgba(255,255,255,0.7);
 }
 
+.delete-all-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    font-weight: bold;
+    gap: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(255, 57, 57, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.delete-all:hover {
+    background: rgba(255, 22, 22, 0.7);
+}
+
 .output-block {
     margin-top: 20px;
 }
 
 #output {
-    width: 100%;
+    width: 97%;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
     height: 100px;
     padding: 10px;
     font-family: monospace;
@@ -232,7 +302,6 @@ input {
 .copy-paste-button:hover {
     background: rgba(255, 255, 255, 0.7);
 }
-
 
 .leaf {
     position: absolute;

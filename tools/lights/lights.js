@@ -25,13 +25,28 @@ function addAnimationStep(r = 0, g = 0, b = 0, a = 1, ms = 100) {
             <label>A</label><input type="number" step="0.01" min="0" max="1" value="${a}">
             <label>MS</label><input type="number" min="1" value="${ms}">
             <div class="color-preview" style="background-color: rgba(${r}, ${g}, ${b}, ${a})"></div>
-            <span class="trash" onclick="removeAnimationStep(this)">🗑️</span>
+            <span class="trash">🗑️</span>
         </div>
     `;
 
     animationStepsContainer.appendChild(wrapper);
 
-    const inputs = wrapper.querySelectorAll('input');
+    const trash = wrapper.querySelector(".trash");
+
+    trash.addEventListener("mouseenter", () => {
+        wrapper.classList.add("trash-hover");
+    });
+    trash.addEventListener("mouseleave", () => {
+        wrapper.classList.remove("trash-hover");
+    });
+
+    trash.addEventListener("click", () => {
+        wrapper.remove();
+        updateOutput();
+        updateStepCount();
+    });    
+
+    const inputs = wrapper.querySelectorAll("input");
     inputs.forEach(input => {
         input.addEventListener("input", enforceInputRules);
         input.addEventListener("input", updateOutput);
@@ -39,6 +54,8 @@ function addAnimationStep(r = 0, g = 0, b = 0, a = 1, ms = 100) {
 
     updateColorPreview(wrapper);
     updateOutput();
+    updateStepCount();
+    wrapper.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 function enforceInputRules(e) {
@@ -101,6 +118,7 @@ function pasteFromInput() {
     });
 
     updateOutput();
+    updateStepCount();
 }
 
 function removeAnimationStep(trashIcon) {
@@ -109,6 +127,19 @@ function removeAnimationStep(trashIcon) {
         stepToRemove.remove();
         updateOutput();
     }
+}
+
+function deleteAllAnimations() {
+    if (confirm("Are you sure you want to delete all animation steps?")) {
+        animationStepsContainer.innerHTML = "";
+        updateOutput();
+        updateStepCount();
+    }
+}
+
+function updateStepCount() {
+    const count = animationStepsContainer.querySelectorAll(".anim-step").length;
+    document.getElementById("step-count").textContent = count;
 }
 
 function createLeaf() {
