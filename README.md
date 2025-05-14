@@ -2,13 +2,12 @@
 Welcome to my GitHub Pages website! This site serves as a hub for my mods, tools, and other projects.
 
 # 🚀 Features
-- Mod Listings – Organized dropdowns for different game mods, including:
-- Lethal Company Mods
-- Content Warning Mods
-- Slime Rancher Mods
-- Check it out here: [Click here!](https://atomictyler1.github.io)
+- Mod statistics
+- Mod sorting
+- Check it out here: [Click here!](https://atomictyler.dev)
 - Custom Tools – Includes utilities like:
     - File Encryptor/Decryptor (Client-Side)
+    - CozyLights Animator
 
 # 🛠️ Installation & Development
 If you want to contribute or modify the website locally:
@@ -22,10 +21,9 @@ Open index.html in your browser or use Live Website for a better experience.
 # 📌 To-Do List 
 - [x] Update README.md
 - [x] Add querys
-- [ ] Get a is-a.dev subdomain
-- [ ] Make 3 Tools
-- [ ] Improve the UI
-- [ ] Fix the leafs bug
+- [x] Get my own .dev domain
+- [x] Make 2 Tools
+- [x] Improve the UI
   
  
 # 🤝 Contributing
@@ -38,4 +36,3 @@ Feel free to suggest improvements or report issues via GitHub Issues.
 
 # 📜 License
 This project is open-source and available under the All Rights Reserved License.
-
