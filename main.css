@@ -9,6 +9,76 @@
     --user-select: none;
 }
 
+body.dark-mode .stat-icon {
+    filter: invert(1);
+}
+
+body.dark-mode header,
+body.dark-mode {
+    --bg: #121212;
+    --text: #e0e0e0;
+    --light-text: #c1c1c1;
+    --accent: #ff7eb3;
+    --secondary: #ff9ec0;
+    --primary: #ffd7e6;
+    --card-bg: rgb(28 28 28 / 85%)
+}
+
+body.dark-mode .anim-step input {
+    background: rgb(0 0 0 / 32%);
+    border: 1px solid rgb(255 158 192 / 0%);
+}
+
+body.dark-mode nav a {
+    color: var(--light-text);
+}
+
+body.dark-mode nav a:hover {
+    color: var(--accent);
+}
+
+body.dark-mode .card,
+body.dark-mode .mod-item,
+body.dark-mode .tool-card, 
+body.dark-mode .resource-item {
+    background: rgba(141, 141, 141, 0.1);
+    color: var(--text);
+}
+
+body.dark-mode .modal-content {
+    background-color: rgba(46, 46, 46, 0.8);
+}
+
+body.dark-mode .btn {
+    background: linear-gradient(45deg, var(--secondary), var(--accent));
+    color: white;
+}
+
+body.dark-mode .social-link {
+    background: rgba(141, 141, 141, 0.1);
+    color: var(--accent);
+}
+
+body.dark-mode header .logo {
+    color: var(--accent);
+}
+
+body.dark-mode .filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(141, 141, 141, 0.1);
+    border: 1px solid var(--secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+body.dark-mode .filter-btn:hover, 
+body.dark-mode .filter-btn.active {
+    background: var(--secondary);
+    color: white;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -57,7 +127,7 @@ header {
 }
 
 nav ul {
-    display: flex;
+    display: inline-flex;
     gap: 2rem;
     list-style: none;
 }
