@@ -55,12 +55,10 @@ overflow-x: hidden;
 background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* NEW: Light Mode Header Overrides */
 body:not(.dark) .nav-header-bg {
 background-color: var(--color-header-bg-light) !important;
 }
 
-/* NEW: Light Mode Logo/Text Overrides (to white-ish pink) */
 body:not(.dark) header .text-[--color-text-main],
 body:not(.dark) #theme-toggle,
 body:not(.dark) #theme-toggle-mobile,
@@ -72,7 +70,6 @@ body:not(.dark) header .text-[--color-text-main]:hover {
 color: var(--color-accent) !important;
 }
 
-/* NEW: Mobile Menu Background Override in Light Mode */
 body:not(.dark) #mobile-menu {
 background-color: var(--color-header-bg-light) !important;
 }
@@ -90,7 +87,6 @@ transform: translateY(-4px);
 box-shadow: 0 20px 25px -5px var(--color-shadow-base), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
-/* --- NAVBAR ANIMATION START --- */
 .nav-link {
 position: relative;
 color: var(--color-text-main);
@@ -139,9 +135,6 @@ background-color: var(--color-accent);
 transform: scaleX(1);
 }
 
-/* --- NAVBAR ANIMATION END --- */
-
-/* --- PAGE TRANSITION ANIMATION START --- */
 @keyframes fadeInSlideUp {
 from {
 opacity: 0;
@@ -157,8 +150,6 @@ transform: translateY(0);
 .page-transition {
 animation: fadeInSlideUp 0.6s ease-out;
 }
-
-/* --- PAGE TRANSITION ANIMATION END --- */
 
 .flame-border {
 position: relative;
@@ -176,19 +167,16 @@ left: 0;
 right: 0;
 bottom: 0;
 z-index: 0;
-/* Ensure ::before is behind the content */
 box-shadow: 0 0 5px 2px var(--color-accent) inset;
 animation: pulseGlow 1.5s ease-in-out infinite alternate;
 opacity: 0.3;
 }
 
-/* FIX: Give the content a higher z-index to allow clicks */
 .cla-step-card .grid {
 position: relative;
 z-index: 10;
 }
 
-/* FIX: Ensure buttons can also be clicked */
 .cla-step-card button {
 position: relative;
 z-index: 10;
@@ -204,7 +192,6 @@ box-shadow: 0 0 6px 3px var(--color-accent) inset;
 }
 }
 
-/* NEW: Swap Animation */
 @keyframes quickFlash {
 
 0%,
@@ -280,7 +267,6 @@ position: relative;
 z-index: 10;
 }
 
-/* --- STYLIZED SCROLLERS (Number Input) --- */
 .cla-step-input {
 width: 100%;
 padding: 0.5rem;
@@ -296,17 +282,14 @@ border: 1px solid var(--color-border);
 background-color: var(--color-background-panel);
 }
 
-/* Hide arrows for number inputs in WebKit */
 .cla-step-input::-webkit-outer-spin-button,
 .cla-step-input::-webkit-inner-spin-button {
 -webkit-appearance: none;
 margin: 0;
 }
 
-/* --- CLA PREVIEW LIGHTS (FIXED for instant transition) --- */
 #cla-preview-light {
 box-shadow: 0 0 20px var(--color-accent)80;
-/* ENSURE INSTANT COLOR CHANGE FOR MOD ACCURACY */
 transition: background-color 0s, box-shadow 0s !important;
 }
 
@@ -324,7 +307,6 @@ align-items: center;
 background-color: var(--color-background-panel);
 }
 
-/* FIX: Cozy Lights Color Picker UI (Removing the white square/border) */
 input[type="color"] {
 -webkit-appearance: none;
 -moz-appearance: none;
@@ -354,7 +336,6 @@ border-radius: 50%;
 outline: none !important;
 }
 
-/* Mobile Adjustments */
 @media (max-width: 640px) {
 .hero-container {
 padding: 4rem 0;
@@ -375,7 +356,7 @@ padding-bottom: 2rem;
 
 .nav-link-mobile.active {
     background-color: var(--color-accent);
-    color: white !important; /* Ensure text is visible over the accent color */
+    color: white !important;
     box-shadow: 0 4px 6px -1px var(--color-shadow-base), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     transform: scale(1.02);
 }
@@ -393,7 +374,7 @@ padding-bottom: 2rem;
     width: 100%;
     height: 100%;
     background-color: black;
-    z-index: 99999; /* Ensure it's on top of everything */
+    z-index: 99999;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -401,12 +382,12 @@ padding-bottom: 2rem;
 }
 
 #rickroll-overlay.konami-hidden {
-    display: none; /* Class used to hide the overlay by default */
+    display: none;
 }
 
 #rickroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the video covers the entire screen */
-    pointer-events: none; /* Prevents interaction with video controls to ensure it can't be turned off */
+    object-fit: cover;
+    pointer-events: none;
 }
