@@ -1,12 +1,31 @@
 const COMMUNITIES_DATA = [
-    { id: 'peak-modding', display: 'PEAK Modding Community', join: '19 April 2025', status: 'Server Owner', invite: 'discord.gg/SAw86z24rB', favourite: true, members: '5,800+', image: 'https://cdn.discordapp.com/icons/1363179626435707082/c72c47d04c782b0a405b024fae6335a8.webp', description: 'The official modding community, partnered with Thunderstore for PEAK.', website: 'https://peakmodding.github.io/' },
-    { id: 'peak', display: 'Official PEAK Discord', join: '17 June 2025', status: 'Moderator', invite: 'discord.gg/peakgame', favourite: true, members: '453,000+', image: 'https://cdn.discordapp.com/icons/1368870708335083650/9547ab960b4e3337ae6f608a63aab45e.webp', description: 'The official discord for PEAK by Landcrab (Landfall & Aggro Crab)', website: 'https://peakpeakpeak.com/' },
+    { id: 'peak-modding', display: 'PEAK Modding Community', join: '19 April 2025', status: 'Server Owner', invite: 'discord.gg/SAw86z24rB', favourite: true, members: '5,900+', image: 'https://cdn.discordapp.com/icons/1363179626435707082/c72c47d04c782b0a405b024fae6335a8.webp', description: 'The official modding community, partnered with Thunderstore for PEAK.', website: 'https://peakmodding.github.io/' },
+    { id: 'peak', display: 'Official PEAK Discord', join: '17 June 2025', status: 'Moderator', invite: 'discord.gg/peakgame', favourite: true, members: '470,000+', image: 'https://cdn.discordapp.com/icons/1368870708335083650/9547ab960b4e3337ae6f608a63aab45e.webp', description: 'The official discord for PEAK by Landcrab (Landfall & Aggro Crab)', website: 'https://peakpeakpeak.com/' },
     { id: 'lethal-company-modding', display: 'Lethal Company Modding', join: '6 August 2024', status: 'Moderator', invite: 'discord.gg/XeyYqRdRGC', favourite: true, members: '39,000+', image: 'https://cdn.discordapp.com/icons/1168655651455639582/a_a1f853e2ebb09bbaa428648109eca048.webp', description: 'The first modding community I joined and modded in!', website: 'https://lethal.wiki/' },
     { id: 'atomics-lab', display: 'Atomic\'s Lab', join: '12 September 2025', status: 'Server Owner', invite: 'discord.gg/PGf9aa9n2t', favourite: false, members: '4+', image: 'https://cdn.discordapp.com/icons/1416132317243510906/6ad870513c1985845888086dff36707c.webp', description: 'A hub for my personal projects and developments.', website: 'https://atomictyler.dev/' },
     { id: 'content-warning-mods', display: 'Content Warning Mods', join: '19 September 2024', status: 'Modder', invite: 'discord.gg/yeGDSm4gFq', favourite: false, members: '14,900+', image: 'https://cdn.discordapp.com/icons/1224455971057958954/bd4d57e5aae0cc746e643a9b427b2a4e.webp', description: 'Official community for Content Warning Mods, by Landfall.' },
     { id: 'repo', display: 'R.E.P.O. Modding Community', join: '17 April 2025', status: 'Thunderstore', invite: 'discord.gg/vPJtKhYAFe', favourite: false, members: '12,300+', image: 'https://cdn.discordapp.com/icons/1344557689979670578/55ee5d529af2ce487eb9b1d0b6d9d49f.webp', description: 'Modding Community for R.E.P.O.' },
     { id: 'thunderstore', display: 'Thunderstore', join: '12 November 2024', status: 'Community Moderator', invite: 'discord.gg/UWpWhjZken', favourite: false, members: '11,200+', image: 'https://cdn.discordapp.com/icons/809128887366975518/b3e3ff21e74318f6c1fc734286e8ac76.webp', description: 'Popular mod hosting site.', website: 'https://thunderstore.io/' }
 ];
+
+const PLATFORM_SVGS = {
+    thunderstore: `<svg class="w-12 h-12" viewBox="0 0 1000 896" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.4223 496.845L209.485 838.17L300 650.202L200.99 477.966C189.992 458.897 189.992 436.945 200.99 417.779L324.555 202.755C335.561 183.611 354.447 172.666 376.421 172.675H442.857L314.286 462.366H473.143L257.143 881.384L690.941 361.014H557.588L648.593 172.675H808.03H900.762L1000 2.28882e-05H715.868H526.836H298.96C263.138 0.0084323 232.393 17.8324 214.461 48.9346L13.4223 398.9C-4.46781 430.078 -4.48036 465.827 13.4223 496.845ZM313.959 895.833H701.066C736.813 895.833 767.63 878.005 785.612 846.819L986.655 496.836C1004.44 465.827 1004.44 430.078 986.655 398.892L906.26 258.947H707.808L799.079 417.779C809.985 436.961 809.984 458.91 799.049 477.974L675.531 693.049C664.454 712.222 645.555 723.15 623.555 723.15H533.795L471.429 722.446L313.959 895.833Z"></path></svg>`,
+    nexus: `<svg height="32" width="32" viewBox="0 0 162 162" xmlns="http://www.w3.org/2000/svg">
+        <g>
+            <path d="M44.4,162.5c-0.6,0-1.3,0-1.9-0.1c-1.5-0.2-2.9-0.5-4.5-1c-2.8-0.9-5.2-2.2-6.9-3.2c-3.8-2.2-7.7-4.9-11.8-8.3 c-1.8-1.5-3.6-3.1-5.3-4.7l-1.4-1.4c-1-0.9-1.9-1.9-2.6-3c-1.3-2-2.4-4.6-2.5-8c-0.1-1.1-0.2-2.2-0.2-3.4c0-2.4,0.1-5,0.5-7.5 c0.7-5.2,2.4-9.8,3.7-13.3c0.1-0.3,0.2-0.6,0.3-0.9c-0.4-0.9-0.7-1.9-1.1-2.9C8.9,99.6,7.7,93.8,7.1,88 c-0.6-6.1-0.4-12.3,0.5-18.4c0.2-1.3,0.4-2.6,0.7-3.8C5.9,62.3,2.9,57.3,1,51.5l0-0.1c-0.4-1.2-1.4-4.2-0.8-8 c0.2-1.4,0.5-2.8,1-4.3c0.9-2.8,2.2-5.1,3.2-6.8c2.2-3.8,4.9-7.6,8.2-11.7c1.5-1.8,3-3.6,4.6-5.2l1.4-1.4 c0.7-0.8,1.5-1.5,2.4-2.1c2-1.5,4.8-2.8,8.6-2.9c1.2-0.1,2.5-0.2,3.8-0.2h0.1c2.5,0,5.2,0.2,7.8,0.6c4,0.6,7.6,1.7,10.8,2.9 c2.1-0.9,4.3-1.7,6.6-2.5C64.1,8,69.9,6.8,75.7,6.4C81.8,5.9,88,6.2,93.9,7.2c1.4,0.2,2.8,0.5,4.2,0.8c4.7-3.2,9-5.5,13.5-6.9 l0.1,0c1-0.4,3.2-1.1,6.1-1.1c0.6,0,1.3,0,1.9,0.1c1.5,0.2,2.9,0.5,4.5,1c2.8,0.9,5.2,2.2,6.9,3.2c3.8,2.2,7.7,4.9,11.8,8.3 c1.8,1.5,3.6,3.1,5.3,4.7l1.4,1.4c0.7,0.6,1.4,1.3,1.9,2.1c1.8,2.3,3.2,5.6,3.3,10.2c0.1,1.6,0.1,3.3,0,5 c-0.2,3.7-0.7,7.2-1.6,10.4c-0.7,2.4-1.5,4.8-2.4,7.2c1.8,4.5,3.1,9.1,4,13.8c1.8,9.9,1.6,20.1-0.6,29.9c1.3,1.9,2.5,3.7,3.5,5.5 c1.7,3,3.1,6.1,4.1,9.3c0.4,1.2,1.3,4.2,0.7,8.2c-0.2,1.4-0.6,2.7-1.1,4.2c-1.8,5.1-4.6,9.3-7.1,12.8c-2.7,3.8-5.8,7.5-9,10.9 l-1.2,1.2c-0.7,0.8-1.5,1.5-2.4,2.2c-2,1.5-4.8,2.7-8.6,2.9c-1.2,0.1-2.5,0.2-3.8,0.2h-0.1c-2.7,0-5.4-0.2-8.2-0.7 c-4.5-0.7-8.5-2.1-12.1-3.5c-1.9,0.8-3.9,1.5-5.8,2.1c-5.6,1.7-11.5,2.8-17.4,3.1c-6.1,0.4-12.3-0.1-18.3-1.2 c-0.7-0.1-1.5-0.3-2.2-0.4c-5.2,3.7-9.8,6.1-14.6,7.7l-0.1,0C49.5,161.7,47.3,162.5,44.4,162.5L44.4,162.5z M24.6,134.1l10.6,3.7 c0.9-2.6,1-5.4,0.4-8c0,0.2,0,0.5,0.1,0.7c0,0.3,0.1,0.7,0.1,1.1c-0.1-2-0.8-4.6-2.6-7c-0.7-0.9-1.5-1.7-2.4-2.4l0.5,0.4l0.9,0.9 c-0.8-0.8-1.7-1.6-2.7-2.3L24.6,134.1L24.6,134.1z M123.7,129.4c-0.8,0.8-1.6,1.6-2.3,2.7l11.9,4.6l0-11.1c0,0,0,0,0,0 c-1.1,0-2.2,0.1-3.2,0.4c0.2,0,0.4,0,0.6,0c0.3,0,0.7-0.1,1.1-0.1c-1.8,0.1-4.2,0.7-6.4,2.1c-1.2,0.8-2.2,1.7-3.1,2.9l0.4-0.5 L123.7,129.4L123.7,129.4z M35.8,126.8c0.5,0.4,1,0.8,1.5,1.3c2.6,2.2,5,3.9,7.2,5.2c1.4-0.7,3-1.7,4.7-3 c0.5-0.3,0.9-0.7,1.4-1.1c0.3-0.2,0.5-0.5,0.8-0.7c0.1-0.1,0.3-0.3,0.4-0.4l6.2-6.3l8.4,2.9c0.3,0.1,0.6,0.2,0.8,0.3 c1.8,0.6,3.6,1,5.4,1.4c3.7,0.7,7.6,1,11.4,0.7c3.6-0.2,7.3-0.9,10.7-1.9c1.7-0.5,3.4-1.1,5-1.9c0.8-0.3,1.6-0.7,2.3-1.1 c2-1,4.3-1.6,6.6-1.6c3.6,0,6.3,1.3,7.6,2c0.4,0.2,0.8,0.4,1.3,0.5c2.5,1,5.4,2.2,8,2.6c0.4,0.1,0.9,0.1,1.3,0.2 c1.5-1.7,2.9-3.5,4.2-5.3c0.8-1.1,1.6-2.2,2.3-3.3c-0.1-0.2-0.2-0.4-0.4-0.7c-0.7-1.2-1.5-2.4-2.5-3.9c-0.3-0.5-0.7-0.9-1.1-1.4 c-0.2-0.2-0.3-0.4-0.5-0.6c-4.1-4-5.5-9.7-3.6-15.1c0.1-0.3,0.2-0.6,0.3-0.8c2.3-7.2,2.7-14.9,1.4-22.3c-0.7-3.5-1.7-7-3.2-10.3 c-0.1-0.3-0.3-0.6-0.4-0.9c-3.3-6.1-1.9-11.3-0.7-13.8c0.5-1,0.9-2.1,1.3-3.1c0.8-1.9,1.4-3.9,2-5.7c0.2-0.9,0.4-1.8,0.5-2.9 c-0.5-0.4-1-0.8-1.5-1.3c-2.7-2.2-5-3.9-7.2-5.2c-1.4,0.8-3,1.8-4.8,3c-0.5,0.4-1,0.8-1.5,1.2c-0.1,0.1-0.3,0.2-0.4,0.4 c-2.7,2.6-6.3,4-10,4c-1.8,0-3.5-0.3-5.2-1c-0.4-0.1-0.8-0.3-1.2-0.4c-1.8-0.5-3.6-1-5.5-1.3c-3.7-0.6-7.6-0.8-11.4-0.5 c-3.6,0.3-7.2,1-10.6,2.1c-1.7,0.5-3.3,1.2-4.9,1.9c-0.8,0.3-1.5,0.7-2.3,1.1L59.5,40c-2.1,1.2-4.6,1.8-7,1.8 c-2.2,0-4.4-0.5-6.5-1.5c-0.5-0.2-0.9-0.4-1.4-0.6c-2.4-1-5.3-2.1-7.8-2.4c-0.4-0.1-0.8-0.1-1.1-0.2c-0.4,0.5-0.8,1-1.2,1.4 c-2.2,2.7-3.9,5-5.2,7.3c0.7,1.4,1.7,2.9,2.9,4.7c0.3,0.5,0.7,1,1.1,1.4c0.2,0.3,0.5,0.5,0.7,0.8l5.8,6.1l-2.5,8 c-0.2,0.5-0.3,1-0.5,1.5c-0.5,1.8-0.9,3.7-1.2,5.6c-0.6,3.8-0.7,7.6-0.3,11.5c0.3,3.6,1.1,7.2,2.3,10.6c0.6,1.7,1.3,3.3,2,4.9 c0.1,0.2,0.2,0.4,0.3,0.6c2.1,4.3,2.1,9.1-0.1,13.4c-0.2,0.4-0.4,0.8-0.5,1.2c-0.4,1-0.9,2-1.3,3c-0.8,2.2-1.8,4.8-2.1,7.1 C35.9,126.3,35.8,126.6,35.8,126.8L35.8,126.8z M129.9,38.8c0.8,0.8,1.7,1.6,2.8,2.4l4.9-12.9L127,24.6c-0.9,2.6-1,5.4-0.4,8 c0-0.1,0-0.2,0-0.3c0-0.3,0-0.8,0-1.3v-0.1c0,1.5,0.5,4,2.1,6.4c0.8,1.1,1.7,2.1,2.8,3l-0.5-0.4L129.9,38.8L129.9,38.8z  M29.3,26.3l0,11.1c1.1,0,2.2-0.1,3.2-0.4c-0.2,0-0.4,0-0.6,0c-0.3,0-0.7,0.1-1.1,0.1c1.8-0.1,4.2-0.7,6.4-2.1 c1.2-0.8,2.2-1.7,3.1-2.9l-0.4,0.5l-0.9,1c0.8-0.8,1.6-1.7,2.3-2.7L29.3,26.3L29.3,26.3z"/>
+            <path fill="#F97316" d="M56.3,88.4l0.7,28.3l-7-5.7c-7.8,12.7-10.3,25-6.6,34.1l1.3,3.2l-3.2-1.4c-7.3-3.2-13.9-7.7-19.4-13.5 l-0.3-0.3l-0.1-0.5c-0.4-3.5-0.2-7.3,0.7-11.2l0-0.1c1.3-4.9,3.2-9.8,5.6-14.7c1.5-3.1,3.3-6.2,5.3-9.2l-6.1-5L56.3,88.4z"/>
+            <path fill="#F97316" d="M105.9,74.1l-0.7-28.3l7,5.7c7.8-12.7,10.3-25,6.6-34.1l-1.3-3.2l3.2,1.4c7.3,3.2,13.9,7.7,19.4,13.5 l0.3,0.3l0.1,0.5c0.4,3.5,0.2,7.3-0.7,11.2l0,0.1c-1.3,4.9-3.2,9.8-5.6,14.7c-1.5,3.1-3.3,6.2-5.3,9.2l6.1,5L105.9,74.1z"/>
+            <path fill="#F97316" d="M88.5,105.4l28.3-0.7l-5.7,7c12.7,7.8,25,10.3,34.1,6.6l3.2-1.3l-1.4,3.2c-3.2,7.3-7.7,13.9-13.5,19.4 l-0.3,0.3l-0.5,0.1c-3.5,0.4-7.3,0.2-11.2-0.7l-0.1,0c-4.9-1.3-9.8-3.2-14.7-5.6c-3.1-1.5-6.2-3.3-9.2-5.3l-5,6.1L88.5,105.4z"/>
+            <path fill="#F97316" d="M74.1,57.6l-28.3,0.7l5.7-7c-12.7-7.8-25-10.3-34.1-6.6L14.3,46l1.4-3.2c3.2-7.3,7.7-13.9,13.5-19.4 l0.3-0.3L30,23c3.5-0.4,7.3-0.2,11.2,0.7l0.1,0c4.9,1.3,9.8,3.2,14.7,5.6c3.1,1.5,6.2,3.3,9.2,5.3l5-6.1L74.1,57.6z"/>
+            <circle fill="#FB923C" cx="81.4" cy="80.8" r="60.5"/>
+            <path fill="#F4F4F5" d="M59.3,59.5c-3.5-1.6-6.1-3.2-8.7-5.1c-4-2.8-7.7-5.9-10.8-9.2c-7.6-7.7-11.6-15.6-10.5-22.1L27,25.6 c-5.5,5.8-12.8,16-12.9,20.4c0.1,0.5,0.1,0.5,0.1,0.5c1,3.4,2.6,6.8,4.9,10.1l0,0.1c3,4.8,8.9,12.7,29.9,21.9l-3.7,7l28.3-7.6 L63.5,51.5L59.3,59.5z"/>
+            <path fill="#F4F4F5" d="M103.3,103.5c3.5,1.6,6.1,3.2,8.7,5.1c4,2.8,7.7,5.9,10.8,9.2c7.6,7.7,11.6,15.6,10.5,22.1l2.3-2.4 c5.5-5.8,12.8-16,12.9-20.4c-0.1-0.5-0.1-0.5-0.1-0.5c-1-3.4-2.6-6.8-4.9-10.1l0-0.1c-3-4.8-8.9-12.7-29.9-21.9l3.7-7l-28.3,7.6 l10.2,26.2L103.3,103.5z"/>
+            <path fill="#F4F4F5" d="M104,59.3c1.6-3.5,3.2-6.1,5.1-8.7c2.8-4,5.9-7.7,9.2-10.8c7.7-7.6,15.6-11.6,22.1-10.5L138,27 c-5.8-5.5-16-12.8-20.4-12.9c-0.5,0.1-0.5,0.1-0.5,0.1c-3.4,1-6.8,2.6-10.1,4.9l-0.1,0c-4.8,3-12.7,8.9-21.9,29.9l-7-3.7 l7.6,28.3L112,63.6L104,59.3z"/>
+            <path fill="#F4F4F5" d="M58.2,103.2c-1.6,3.5-3.2,6.1-5.1,8.7c-2.8,4-5.9,7.7-9.2,10.8c-7.7,7.6-15.6,11.6-22.1,10.5l2.4,2.3 c5.8,5.5,16,12.8,20.4,12.9c0.5-0.1,0.5-0.1,0.5-0.1c3.4-1,6.8-2.6,10.1-4.9l0.1,0c4.8-3,12.7-8.9,21.9-29.9l7,3.7l-7.6-28.3 L50.3,98.9L58.2,103.2z"/>
+        </g>
+        </svg>`,
+    steam: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M18.102 12.129c0-0 0-0 0-0.001 0-1.564 1.268-2.831 2.831-2.831s2.831 1.268 2.831 2.831c0 1.564-1.267 2.831-2.831 2.831-0 0-0 0-0.001 0h0c-0 0-0 0-0.001 0-1.563 0-2.83-1.267-2.83-2.83 0-0 0-0 0-0.001v0zM24.691 12.135c0-2.081-1.687-3.768-3.768-3.768s-3.768 1.687-3.768 3.768c0 2.081 1.687 3.768 3.768 3.768v0c2.080-0.003 3.765-1.688 3.768-3.767v-0zM10.427 23.76l-1.841-0.762c0.524 1.078 1.611 1.808 2.868 1.808 1.317 0 2.448-0.801 2.93-1.943l0.008-0.021c0.155-0.362 0.246-0.784 0.246-1.226 0-1.757-1.424-3.181-3.181-3.181-0.405 0-0.792 0.076-1.148 0.213l0.022-0.007 1.903 0.787c0.852 0.364 1.439 1.196 1.439 2.164 0 1.296-1.051 2.347-2.347 2.347-0.324 0-0.632-0.066-0.913-0.184l0.015 0.006zM15.974 1.004c-7.857 0.001-14.301 6.046-14.938 13.738l-0.004 0.054 8.038 3.322c0.668-0.462 1.495-0.737 2.387-0.737 0.001 0 0.002 0 0.002 0h-0c0.079 0 0.156 0.005 0.235 0.008l3.575-5.176v-0.074c0.003-3.12 2.533-5.648 5.653-5.648 3.122 0 5.653 2.531 5.653 5.653s-2.531 5.653-5.653 5.653h-0.131l-5.094 3.638c0 0.065 0.005 0.131 0.005 0.199 0 0.001 0 0.002 0 0.003 0 2.342-1.899 4.241-4.241 4.241-2.047 0-3.756-1.451-4.153-3.38l-0.005-0.027-5.755-2.383c1.841 6.345 7.601 10.905 14.425 10.905 8.281 0 14.994-6.713 14.994-14.994s-6.713-14.994-14.994-14.994c-0 0-0.001 0-0.001 0h0z"></path></svg>`
+};
 
 let MOD_STATS = { total_downloads: 0, total_ratings: 0, last_checked: 0 };
 let ALL_MODS = [];
@@ -200,13 +219,15 @@ async function fetchModData() {
 
         ALL_MODS = Object.entries(fileContent)
             .filter(([k, v]) => v && v.downloads !== undefined)
-            .map(([key, modData]) => ({
-                name: key,
-                author: key.startsWith("Steam -") ? "AtomicStudio (Steam)" : "AtomicStudio",
-                ratings: modData.ratings ??
-                    (modData["positive ratings"] || 0) + (modData["negative ratings"] || 0),
-                ...modData
-            }));
+            .map(([key, modData]) => {
+                const isSteam = modData.platform === 'Steam';
+                
+                return {
+                    name: key,
+                    author: isSteam ? "Atomic();" : "AtomicStudio",
+                    ...modData
+                };
+            });
 
         console.log("✅ Successfully loaded", ALL_MODS.length, "mods from Gist");
         localStorage.setItem(CACHE_KEY_MODS, JSON.stringify({
@@ -344,30 +365,83 @@ function renderRepoCard(repo) {
 }
 
 function renderModCard(mod) {
-    const isPopular = mod.popular ? `<span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded-full font-semibold ml-2">POPULAR</span>` : '';
-    const platformIcon = mod.platform === 'Steam' ? 'cog' : 'zap';
+    let isPopular = ``;
+    if (mod.popular == "True") {
+        isPopular = `
+            <div class="absolute top-2 right-2 bg-gradient-to-r from-amber-500/90 to-yellow-500/90 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-lg z-10 flex items-center gap-1 border border-yellow-300/30">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-white"></i>
+                <span class="text-[11px] font-bold text-white tracking-wide">POPULAR</span>
+            </div>
+        `;
+    }
+    
+    let platformBadge = '';
+    if (mod.platform) {
+        const platform = mod.platform.toLowerCase();
+        let platformSvg = PLATFORM_SVGS[platform] || PLATFORM_SVGS.thunderstore;
+        
+        const coloredSvg = platformSvg
+            .replace('class="', 'class="w-5 h-5 ')
+            .replace('fill="currentColor"', 'fill="currentColor"');
+        
+        platformBadge = `
+            <div class="absolute top-2 left-2 bg-black/70 dark:bg-gray-900/80 backdrop-blur-sm rounded-full p-1.5 shadow-lg z-10 border border-white/10">
+                <div class="w-5 h-5 flex items-center justify-center text-white">
+                    ${coloredSvg}
+                </div>
+            </div>
+        `;
+    }
+    
+    const platform = mod.platform ? mod.platform.toLowerCase() : 'thunderstore';
 
-    const ratingsText = mod.platform === 'Steam'
-        ? `${formatNumber(mod["positive ratings"] || 0)} <span class="text-green-500 font-semibold">^</span> / ${formatNumber(mod["negative ratings"] || 0)} <span class="text-red-500 font-semibold">v</span>`
-        : `${formatNumber(mod.ratings)} Total`;
+    let ratings = mod.ratings || 0;
+    if (mod.platform == "Steam") {
+        ratings = mod["positive ratings"] || 0;
+    }
+    
+    let iconHtml = `<div class="text-[--color-accent] opacity-50 scale-75">${PLATFORM_SVGS[platform] || PLATFORM_SVGS.thunderstore}</div>`;
+    
+    if (platform === 'thunderstore' && mod.link) {
+        try {
+            const urlParts = mod.link.split('/p/')[1].split('/');
+            const author = urlParts[0];
+            const modName = urlParts[1];
+            const version = mod.version || "1.0.0";
+            const iconUrl = `https://gcdn.thunderstore.io/live/repository/icons/${author}-${modName}-${version}.png`;
+            
+            iconHtml = `<img src="${iconUrl}" alt="${mod.name}" class="mod-card-image w-full h-full object-cover" onerror="this.outerHTML='<div class=\\'flex items-center justify-center w-full h-full text-[--color-accent] opacity-50 scale-75\\'>${PLATFORM_SVGS.thunderstore}</div>`;
+        } catch (e) {
+            console.warn("Could not parse Thunderstore link for icon", mod.name);
+        }
+    } else if (mod.icon) {
+        iconHtml = `<img src="${mod.icon}" alt="${mod.name}" class="mod-card-image w-full h-full object-cover" onerror="this.outerHTML='<div class=\\'flex items-center justify-center w-full h-full text-[--color-accent] opacity-50 scale-75\\'>${PLATFORM_SVGS[platform] || PLATFORM_SVGS.thunderstore}</div>`;
+    }
 
     return `
-                <a href="${mod.link}" target="_blank" class="panel-block p-4 flex items-center hover:bg-[--color-subtle]/10 transition duration-300">
-                    <i data-lucide="${platformIcon}" class="w-6 h-6 text-[--color-accent] mr-4 flex-shrink-0"></i>
-                    <div class="flex-grow min-w-0">
-                        <h4 class="text-lg font-bold text-[--color-text-main] truncate">${mod.name}${isPopular}</h4>
-                        <p class="text-sm text-[--color-subtle]">${mod.community} (${mod.platform}) - v${mod.version || 'N/A'}</p>
-                    </div>
-                    <div class="text-right flex-shrink-0 ml-4 hidden sm:block">
-                        <p class="text-md font-bold text-[--color-accent]">${formatNumber(mod.downloads)}</p>
-                        <p class="text-xs text-[--color-subtle]">Downloads</p>
-                    </div>
-                    <div class="text-right flex-shrink-0 ml-4 hidden sm:block w-32">
-                        <p class="text-sm font-semibold text-[--color-text-main]">${ratingsText}</p>
-                        <p class="text-xs text-[--color-subtle]">Ratings</p>
-                    </div>
-                </a>
-            `;
+        <a href="${mod.link}" target="_blank" class="mod-card panel-block group relative flex flex-col p-0 overflow-hidden transition-all duration-300">
+            <div class="mod-card-icon-wrapper aspect-square w-full bg-gradient-to-br from-[--color-subtle]/5 to-[--color-subtle]/15 flex items-center justify-center relative overflow-hidden">
+                ${platformBadge}
+                ${isPopular}
+                ${iconHtml}
+            </div>
+            <div class="p-4 flex flex-col flex-grow">
+                <h4 class="text-base font-bold text-[--color-text-main] line-clamp-2 min-h-[3rem] group-hover:text-[--color-accent] transition-colors leading-tight mb-2">${mod.name}</h4>
+                <p class="text-xs text-[--color-subtle] mb-3 font-medium">${mod.community || 'Unknown'} • v${mod.version || '1.0.0'}</p>
+                
+                <div class="mt-auto pt-3 border-t border-[--color-border] flex items-center justify-between text-sm font-bold">
+                    <span class="flex items-center gap-1.5 text-[--color-accent] bg-[--color-accent]/10 px-3 py-1.5 rounded-full">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span class="text-xs">${formatNumber(mod.downloads || 0)}</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 px-3 py-1.5 rounded-full">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <span class="text-xs">${formatNumber(ratings)}</span>
+                    </span>
+                </div>
+            </div>
+        </a>
+    `;
 }
 
 function updateModSort(by) {
@@ -405,6 +479,11 @@ function sortAndFilterMods() {
     filtered.sort((a, b) => {
         let valA = a[CURRENT_SORT.by] || 0;
         let valB = b[CURRENT_SORT.by] || 0;
+
+        if (CURRENT_SORT.by === 'ratings') {
+            valA = a.platform === 'Steam' ? (a['positive ratings'] || 0) : valA;
+            valB = b.platform === 'Steam' ? (b['positive ratings'] || 0) : valB;
+        }
 
         if (CURRENT_SORT.by === 'name') {
             valA = a.name.toLowerCase();
@@ -472,7 +551,7 @@ function renderProjectsPage() {
                             </select>
                             </div>
 
-                        <div id="mods-list-container" class="space-y-4">
+                        <div id="mods-list-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             </div>
                     </div>
 
@@ -1067,12 +1146,9 @@ function rickroll() {
     const video = document.getElementById('rickroll-video');
 
     if (overlay && video) {
-        // 1. Show the overlay
         overlay.classList.remove('konami-hidden');
 
-        // 2. Play the video
         video.play().catch(error => {
-            // Autoplay prevention is common, so we mute it and try again if play fails.
             console.warn("Autoplay blocked. Attempting to play muted.", error);
             video.muted = true;
             video.play().catch(e => {
@@ -1087,19 +1163,16 @@ function rickroll() {
 document.addEventListener('keydown', (e) => {
     if (easterEggActivated) return;
     
-    // Get the required key code for the current position
     let requiredKey = konamiCode[konamiCodePosition];
 
     if (e.keyCode === requiredKey) {
         konamiCodePosition++;
 
-        // If the entire sequence is entered, trigger the function
         if (konamiCodePosition === konamiCode.length) {
             rickroll();
-            konamiCodePosition = 0; // Reset just in case
+            konamiCodePosition = 0;
         }
     } else {
-        // Key sequence broken, reset to the start
         konamiCodePosition = 0;
     }
 });

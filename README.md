@@ -5,9 +5,6 @@ Welcome to my GitHub Pages website! This site serves as a hub for my mods, tools
 - Mod statistics
 - Mod sorting
 - Check it out here: [Click here!](https://atomictyler.dev)
-- Custom Tools – Includes utilities like:
-    - File Encryptor/Decryptor (Client-Side)
-    - CozyLights Animator
 
 # 🛠️ Installation & Development
 If you want to contribute or modify the website locally:
