@@ -73,7 +73,6 @@ const CLA_PRESETS = {
     ]
 };
 
-
 let CLA_STATE = {
     steps: CLA_PRESETS['Default Pulse'],
     currentStepIndex: 0,
@@ -90,6 +89,7 @@ const contentDiv = document.getElementById('content');
 const appContainer = document.getElementById('app');
 
 const formatNumber = (num) => new Intl.NumberFormat('en-US').format(num);
+
 function initializeTheme() {
     const savedTheme = localStorage.getItem(CACHE_KEY_THEME);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -182,6 +182,9 @@ function navigate(page) {
         case 'leveling':
             renderLevelingPage();
             break;
+        case 'peakPresets':
+            renderPeakPresetsPage();
+            break;
         default:
             renderHomePage();
     }
@@ -208,7 +211,7 @@ async function fetchModData() {
         const gist = await response.json();
 
         if (!gist.files || !gist.files[GIST_FILE_NAME]) {
-            console.error("⚠️ prev.json not found in Gist");
+            console.error("prev.json not found in Gist");
             return;
         }
 
@@ -232,16 +235,15 @@ async function fetchModData() {
                 };
             });
 
-        console.log("✅ Successfully loaded", ALL_MODS.length, "mods from Gist");
+        console.log("Successfully loaded", ALL_MODS.length, "mods from Gist");
         localStorage.setItem(CACHE_KEY_MODS, JSON.stringify({
             data: { mods: ALL_MODS, stats: MOD_STATS },
             timestamp: Date.now()
         }));
     } catch (err) {
-        console.error("❌ Failed to fetch mod data:", err);
+        console.error("Failed to fetch mod data:", err);
     }
 }
-
 
 async function fetchGithubRepos() {
     const cachedData = localStorage.getItem(CACHE_KEY_GITHUB);
@@ -293,52 +295,52 @@ function refreshDataViews() {
 
 function renderHomePage() {
     contentDiv.innerHTML = `
-                <div class="hero-container page-transition">
-                    <div class="hero-content">
-                        <h1 class="text-7xl sm:text-8xl lg:text-9xl font-extrabold text-[--color-text-main] tracking-tighter opacity-90">
-                            Atomic<span class="text-[--color-accent] text-12xl">();</span>
-                        </h1>
-                        <p class="text-xl sm:text-2xl font-light mt-4 text-[--color-subtle] max-w-2xl mx-auto">
-                            The personal hub for my projects, mods, and communities.
-                        </p>
-                        
-                        <div class="mt-12 flex justify-center space-x-6">
-                            <a href="#projects" class="bg-[--color-accent] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-[--color-shadow-base] hover:opacity-90 transition duration-300 transform hover:scale-105">
-                                View Projects
-                            </a>
-                            <a href="#communities" class="bg-gray-700 dark:bg-[--color-background-panel] text-white dark:text-[--color-text-main] font-bold py-3 px-8 rounded-full shadow-lg dark:shadow-md dark:shadow-[--color-subtle]/50 hover:bg-gray-600 dark:hover:bg-[--color-border] transition duration-300 transform hover:scale-105">
-                                Join Communities
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <section id="mod-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 text-center">
-                    <div class="panel-block p-6">
-                        <i data-lucide="download-cloud" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
-                        <p class="text-3xl font-bold text-[--color-text-main]" id="total-downloads">...</p>
-                        <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Total Downloads</p>
-                    </div>
-                    <div class="panel-block p-6">
-                        <i data-lucide="star" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
-                         <p class="text-3xl font-bold text-[--color-text-main]" id="total-ratings">...</p>
-                        <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Total Ratings</p>
-                    </div>
-                    <div class="panel-block p-6">
-                        <i data-lucide="puzzle" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
-                         <p class="text-3xl font-bold text-[--color-text-main]" id="total-mods-count">...</p>
-                        <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Mods Available</p>
-                    </div>
-                </section>
+        <div class="hero-container page-transition">
+            <div class="hero-content">
+                <h1 class="text-7xl sm:text-8xl lg:text-9xl font-extrabold text-[--color-text-main] tracking-tighter opacity-90">
+                    Atomic<span class="text-[--color-accent] text-12xl">();</span>
+                </h1>
+                <p class="text-xl sm:text-2xl font-light mt-4 text-[--color-subtle] max-w-2xl mx-auto">
+                    The personal hub for my projects, mods, and communities.
+                </p>
                 
-                <section class="mt-16 text-center">
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-4">Online Tools</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">Quickly access the online tools I've built to help mod developers.</p>
-                    <a href="#tools" class="inline-block bg-[--color-subtle]/30 dark:bg-[--color-background-panel] text-[--color-text-main] font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[--color-subtle]/50 dark:hover:bg-[--color-border] transition duration-300">
-                        Explore Tools <i data-lucide="wrench" class="w-5 h-5 inline ml-2"></i>
+                <div class="mt-12 flex justify-center space-x-6">
+                    <a href="#projects" class="bg-[--color-accent] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-[--color-shadow-base] hover:opacity-90 transition duration-300 transform hover:scale-105">
+                        View Projects
                     </a>
-                </section>
-            `;
+                    <a href="#communities" class="bg-gray-700 dark:bg-[--color-background-panel] text-white dark:text-[--color-text-main] font-bold py-3 px-8 rounded-full shadow-lg dark:shadow-md dark:shadow-[--color-subtle]/50 hover:bg-gray-600 dark:hover:bg-[--color-border] transition duration-300 transform hover:scale-105">
+                        Join Communities
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <section id="mod-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 text-center">
+            <div class="panel-block p-6">
+                <i data-lucide="download-cloud" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
+                <p class="text-3xl font-bold text-[--color-text-main]" id="total-downloads">...</p>
+                <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Total Downloads</p>
+            </div>
+            <div class="panel-block p-6">
+                <i data-lucide="star" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
+                 <p class="text-3xl font-bold text-[--color-text-main]" id="total-ratings">...</p>
+                <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Total Ratings</p>
+            </div>
+            <div class="panel-block p-6">
+                <i data-lucide="puzzle" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
+                 <p class="text-3xl font-bold text-[--color-text-main]" id="total-mods-count">...</p>
+                <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Mods Available</p>
+            </div>
+        </section>
+        
+        <section class="mt-16 text-center">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-4">Online Tools</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">Quickly access the online tools I've built to help mod developers.</p>
+            <a href="#tools" class="inline-block bg-[--color-subtle]/30 dark:bg-[--color-background-panel] text-[--color-text-main] font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[--color-subtle]/50 dark:hover:bg-[--color-border] transition duration-300">
+                Explore Tools <i data-lucide="wrench" class="w-5 h-5 inline ml-2"></i>
+            </a>
+        </section>
+    `;
     lucide.createIcons();
     updateHomePageStats();
 }
@@ -346,25 +348,25 @@ function renderHomePage() {
 function renderRepoCard(repo) {
     const lastPushed = new Date(repo.pushed_at).toLocaleDateString();
     return `
-                 <a href="${repo.html_url}" target="_blank" class="panel-block p-6 flex flex-col justify-between">
-                     <div>
-                         <div class="flex items-center justify-between">
-                             <h3 class="text-xl font-bold text-[--color-accent]">${repo.name}</h3>
-                             ${repo.language ? `<span class="text-xs font-mono bg-[--color-subtle]/20 px-2 py-1 rounded-full text-[--color-text-main]">${repo.language}</span>` : ''}
-                         </div>
-                         <p class="text-sm text-[--color-text-main] mt-2">${repo.description || 'No description provided.'}</p>
-                     </div>
-                     <div class="mt-4 flex justify-between items-center text-sm text-[--color-subtle]">
-                         <span class="flex items-center">
-                             <i data-lucide="star" class="w-4 h-4 mr-1"></i>${repo.stargazers_count}
-                         </span>
-                         <span class="flex items-center">
-                             <i data-lucide="git-fork" class="w-4 h-4 mr-1"></i>${repo.forks_count}
-                         </span>
-                         <span>Updated: ${lastPushed}</span>
-                     </div>
-                 </a>
-             `;
+        <a href="${repo.html_url}" target="_blank" class="panel-block p-6 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-[--color-accent]">${repo.name}</h3>
+                    ${repo.language ? `<span class="text-xs font-mono bg-[--color-subtle]/20 px-2 py-1 rounded-full text-[--color-text-main]">${repo.language}</span>` : ''}
+                </div>
+                <p class="text-sm text-[--color-text-main] mt-2">${repo.description || 'No description provided.'}</p>
+            </div>
+            <div class="mt-4 flex justify-between items-center text-sm text-[--color-subtle]">
+                <span class="flex items-center">
+                    <i data-lucide="star" class="w-4 h-4 mr-1"></i>${repo.stargazers_count}
+                </span>
+                <span class="flex items-center">
+                    <i data-lucide="git-fork" class="w-4 h-4 mr-1"></i>${repo.forks_count}
+                </span>
+                <span>Updated: ${lastPushed}</span>
+            </div>
+        </a>
+    `;
 }
 
 function renderModCard(mod) {
@@ -413,7 +415,7 @@ function renderModCard(mod) {
             const version = mod.version || "1.0.0";
             const iconUrl = `https://gcdn.thunderstore.io/live/repository/icons/${author}-${modName}-${version}.png`;
             
-            iconHtml = `<img src="${iconUrl}" alt="${mod.name}" class="mod-card-image w-full h-full object-cover" onerror="this.outerHTML='<div class=\\'flex items-center justify-center w-full h-full text-[--color-accent] opacity-50 scale-75\\'>${PLATFORM_SVGS.thunderstore}</div>`;
+            iconHtml = `<img src="${iconUrl}" alt="${mod.name}" class="mod-card-image w-full h-full object-cover" onerror="this.outerHTML='<div class=\\'flex items-center justify-center w-full h-full text-[--color-accent] opacity-50 scale-75\\'>${PLATFORM_SVGS.thunderstore}</div>`; 
         } catch (e) {
             console.warn("Could not parse Thunderstore link for icon", mod.name);
         }
@@ -526,48 +528,46 @@ function renderProjectsPage() {
         : '<p class="text-center text-gray-500 italic col-span-full py-8">Fetching GitHub repositories...</p>';
 
     contentDiv.innerHTML = `
-                <div class="page-transition">
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2 mt-16">My Mods (${allModsArray.length} Total)</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">All my published mods and their statistics.</p>
+        <div class="page-transition">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2 mt-16">My Mods (${allModsArray.length} Total)</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">All my published mods and their statistics.</p>
+            
+            <div class="panel-block p-6 mb-8">
+                <div class="flex flex-wrap items-center gap-4 mb-6 p-4 border-b border-[--color-border]">
+                    <label class="font-semibold text-sm">Sort By:</label>
+                    <select id="mod-sort-by" onchange="updateModSort(this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
+                        <option value="downloads" ${CURRENT_SORT.by === 'downloads' ? 'selected' : ''}>Downloads</option>
+                        <option value="ratings" ${CURRENT_SORT.by === 'ratings' ? 'selected' : ''}>Ratings</option>
+                        <option value="name" ${CURRENT_SORT.by === 'name' ? 'selected' : ''}>Name</option>
+                    </select>
                     
-                    <div class="panel-block p-6 mb-8">
-                        <div class="flex flex-wrap items-center gap-4 mb-6 p-4 border-b border-[--color-border]">
-                            <label class="font-semibold text-sm">Sort By:</label>
-                            <select id="mod-sort-by" onchange="updateModSort(this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
-                                <option value="downloads" ${CURRENT_SORT.by === 'downloads' ? 'selected' : ''}>Downloads</option>
-                                <option value="ratings" ${CURRENT_SORT.by === 'ratings' ? 'selected' : ''}>Ratings</option>
-                                <option value="name" ${CURRENT_SORT.by === 'name' ? 'selected' : ''}>Name</option>
-                            </select>
-                            
-                            <button onclick="toggleModSortOrder()" class="p-2 bg-[--color-subtle]/30 rounded-lg text-[--color-text-main] hover:bg-[--color-subtle]/50" id="mod-sort-order-btn">
-                                <i data-lucide="arrow-down" class="w-4 h-4 inline mr-1"></i> Desc
-                            </button>
-                            
-                            <label class="font-semibold text-sm ml-4">Platform:</label>
-                            <select id="mod-filter-platform" onchange="updateModFilter('platform', this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
-                                ${platforms.map(p => `<option value="${p}" ${CURRENT_FILTER.platform === p ? 'selected' : ''}>${p}</option>`).join('')}
-                            </select>
+                    <button onclick="toggleModSortOrder()" class="p-2 bg-[--color-subtle]/30 rounded-lg text-[--color-text-main] hover:bg-[--color-subtle]/50" id="mod-sort-order-btn">
+                        <i data-lucide="arrow-down" class="w-4 h-4 inline mr-1"></i> Desc
+                    </button>
+                    
+                    <label class="font-semibold text-sm ml-4">Platform:</label>
+                    <select id="mod-filter-platform" onchange="updateModFilter('platform', this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
+                        ${platforms.map(p => `<option value="${p}" ${CURRENT_FILTER.platform === p ? 'selected' : ''}>${p}</option>`).join('')}
+                    </select>
 
-                            <label class="font-semibold text-sm ml-4">Community:</label>
-                            <select id="mod-filter-community" onchange="updateModFilter('community', this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
-                                ${communities.map(c => `<option value="${c}" ${CURRENT_FILTER.community === c ? 'selected' : ''}>${c}</option>`).join('')}
-                            </select>
-                            </div>
-
-                        <div id="mods-list-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            </div>
-                    </div>
-
+                    <label class="font-semibold text-sm ml-4">Community:</label>
+                    <select id="mod-filter-community" onchange="updateModFilter('community', this.value)" class="p-2 border rounded-lg bg-[--color-background-panel] text-[--color-text-main]">
+                        ${communities.map(c => `<option value="${c}" ${CURRENT_FILTER.community === c ? 'selected' : ''}>${c}</option>`).join('')}
+                    </select>
                 </div>
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">My Open-Source Code</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">A snapshot of my recent activity on GitHub, showcasing my open-source infrastructure and projects.</p>
-                    <div id="github-repos-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-                        ${githubContent}
-                    </div> 
-            `;
+
+                <div id="mods-list-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                </div>
+            </div>
+        </div>
+        <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">My Open-Source Code</h2>
+        <p class="text-lg text-[--color-subtle] mb-8">A snapshot of my recent activity on GitHub, showcasing my open-source infrastructure and projects.</p>
+        <div id="github-repos-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            ${githubContent}
+        </div> 
+    `;
 
     lucide.createIcons();
-
     sortAndFilterMods();
 }
 
@@ -576,56 +576,56 @@ function renderCommunitiesPage() {
         const isFavourite = community.favourite ? '<span class="absolute top-4 left-4 text-yellow-500"><i data-lucide="star" class="w-5 h-5 fill-current"></i></span>' : '';
 
         const websiteIcon = community.website ? `
-                    <a href="${community.website}" target="_blank" class="absolute top-4 right-4 text-[--color-accent] hover:text-[--color-text-main] transition duration-300 z-10" aria-label="Visit Community Website">
-                        <i data-lucide="globe" class="w-5 h-5"></i>
-                    </a>
-                ` : '';
+            <a href="${community.website}" target="_blank" class="absolute top-4 right-4 text-[--color-accent] hover:text-[--color-text-main] transition duration-300 z-10" aria-label="Visit Community Website">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+            </a>
+        ` : '';
 
         return `
-                    <div class="panel-block p-6 flex flex-col justify-between h-full relative overflow-hidden">
-                        ${isFavourite}
-                        ${websiteIcon}
-                        
-                        <div class="flex items-start space-x-4 mb-4">
-                            <img src="${community.image}" alt="${community.display} icon" class="w-16 h-16 rounded-xl shadow-md flex-shrink-0">
-                            <div>
-                                <h3 class="text-xl font-bold text-[--color-text-main]">${community.display}</h3>
-                                <p class="text-sm text-[--color-accent] font-semibold">${community.status}</p>
-                            </div>
-                        </div>
-                        
-                        <p class="text-sm text-[--color-text-main] mb-4 flex-grow">${community.description}</p>
-                        
-                        <div class="text-xs text-[--color-subtle] mb-4 border-t border-[--color-border] pt-3">
-                            <p>Joined: ${community.join}</p>
-                            <p>Members: ${community.members}</p>
-                        </div>
-
-                        <button onclick="window.open('https://${community.invite}', '_blank')" class="mt-4 w-full bg-[--color-accent] text-white py-2 rounded-lg font-bold hover:opacity-80 transition duration-300 shadow-md shadow-[--color-shadow-base]">
-                            Join Discord
-                        </button>
+            <div class="panel-block p-6 flex flex-col justify-between h-full relative overflow-hidden">
+                ${isFavourite}
+                ${websiteIcon}
+                
+                <div class="flex items-start space-x-4 mb-4">
+                    <img src="${community.image}" alt="${community.display} icon" class="w-16 h-16 rounded-xl shadow-md flex-shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[--color-text-main]">${community.display}</h3>
+                        <p class="text-sm text-[--color-accent] font-semibold">${community.status}</p>
                     </div>
-                `;
+                </div>
+                
+                <p class="text-sm text-[--color-text-main] mb-4 flex-grow">${community.description}</p>
+                
+                <div class="text-xs text-[--color-subtle] mb-4 border-t border-[--color-border] pt-3">
+                    <p>Joined: ${community.join}</p>
+                    <p>Members: ${community.members}</p>
+                </div>
+
+                <button onclick="window.open('https://${community.invite}', '_blank')" class="mt-4 w-full bg-[--color-accent] text-white py-2 rounded-lg font-bold hover:opacity-80 transition duration-300 shadow-md shadow-[--color-shadow-base]">
+                    Join Discord
+                </button>
+            </div>
+        `;
     };
 
     const favouriteCommunities = COMMUNITIES_DATA.filter(c => c.favourite).map(communityCardTemplate).join('');
     const otherCommunities = COMMUNITIES_DATA.filter(c => !c.favourite).map(communityCardTemplate).join('');
 
     contentDiv.innerHTML = `
-                <div class="page-transition">
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Favourite Communities</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">These are the communities I am most actively involved in, featuring some of my main modding work.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                        ${favouriteCommunities}
-                    </div>
+        <div class="page-transition">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Favourite Communities</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">These are the communities I am most actively involved in, featuring some of my main modding work.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                ${favouriteCommunities}
+            </div>
 
-                    <h3 class="text-3xl font-extrabold text-[--color-text-main] mb-6 border-b border-[--color-border] pb-2 mt-12">Other Communities</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${otherCommunities}
-                    </div>
-                </div>
-            `;
+            <h3 class="text-3xl font-extrabold text-[--color-text-main] mb-6 border-b border-[--color-border] pb-2 mt-12">Other Communities</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                ${otherCommunities}
+            </div>
+        </div>
+    `;
     lucide.createIcons();
 }
 
@@ -646,221 +646,622 @@ function renderToolsPage() {
             description: 'Calculate XP requirements to get from level A to level B with my mod!',
             link: '#leveling',
             accent: 'text-pink-500'
+        },
+        { 
+            id: 'peakPresets', 
+            icon: 'settings', 
+            title: 'Peak Presets',
+            link: '#peakPresets',
+            description: 'Configure custom challenges for the Challenge Creator mod with an easy-to-use editor.' 
         }
     ];
 
     contentDiv.innerHTML = `
-                <div class="page-transition">
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Online Tools</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">Handy tools built to simplify the modding experience for developers and users.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        ${toolCards.map(tool => `
-                            <a href="${tool.link}" class="panel-block p-6 flex items-start space-x-4">
-                                <i data-lucide="${tool.icon}" class="w-8 h-8 ${tool.accent} flex-shrink-0 mt-1"></i>
-                                <div>
-                                    <h3 class="text-xl font-bold text-[--color-text-main]">${tool.title}</h3>
-                                    <p class="text-sm text-[--color-subtle] mt-1">${tool.description}</p>
-                                </div>
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+        <div class="page-transition">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Online Tools</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">Handy tools built to simplify the modding experience for developers and users.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${toolCards.map(tool => `
+                    <a href="${tool.link}" class="panel-block p-6 flex items-start space-x-4">
+                        <i data-lucide="${tool.icon}" class="w-8 h-8 ${tool.accent} flex-shrink-0 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold text-[--color-text-main]">${tool.title}</h3>
+                            <p class="text-sm text-[--color-subtle] mt-1">${tool.description}</p>
+                        </div>
+                    </a>
+                `).join('')}
+            </div>
+        </div>
+    `;
     lucide.createIcons();
 }
 
+let currentChallenge = JSON.parse(localStorage.getItem('peak_preset_cache')) || {
+    Name: "", Creators: "", Notes: "", MinAscent: -1, 
+    AllowHigherAscents: true, disallowedItems: [], 
+    oneTimeUseItems: [], allowedItemsOnly: [],
+    Itemless: false, DisableRopeTypes: false,
+    alwaysHaveTick: false, noMultiplayer: false,
+    minimumPlayers: 1, allowReserveStamina: true,
+    noSprinting: false, noJumping: false, noBackpack: false,
+    controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
+    controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
+};
+
+function savePresetCache() {
+    localStorage.setItem('peak_preset_cache', JSON.stringify(currentChallenge));
+}
+
+function formatItemNameForWiki(itemName) {
+    return itemName.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join('_');
+}
+
+let manualImageOverrides = {
+    "ANTI-ROPE SPOOL": "https://peak.wiki.gg/images/thumb/Anti-Rope_Spool.png/64px-Anti-Rope_Spool.png?ae4d5d",
+    "THE BOOK OF BONES": "https://peak.wiki.gg/images/thumb/The_Book_of_Bones.png/64px-The_Book_of_Bones.png?90f081",
+    "BUGLE OF FRIENDSHIP": "https://peak.wiki.gg/images/thumb/Bugle_of_Friendship.png/64px-Bugle_of_Friendship.png?ae33da",
+    "BUGLE OF FRIENDSHIP": "https://peak.wiki.gg/images/thumb/Bugle_of_Friendship.png/64px-Bugle_of_Friendship.png?ae33da",
+    "CURE-ALL": "https://peak.wiki.gg/images/thumb/Cure-All.png/64px-Cure-All.png?de867e",
+    "GREEN CLUSTERBERRY": "https://peak.wiki.gg/images/thumb/Clusterberry_Green.png/64px-Clusterberry_Green.png?b366c0",
+    "BERRYNANA PEEL": "https://peak.wiki.gg/images/thumb/Yellow_Berrynana_Peel.png/192px-Yellow_Berrynana_Peel.png?512b95",
+    "BISHOP": "https://peak.wiki.gg/images/thumb/Bishop_Black.png/64px-Bishop_Black.png?9a2fe4",
+    "KING": "https://peak.wiki.gg/images/thumb/King_Black.png/64px-King_Black.png?cd0105",
+    "KNIGHT": "https://peak.wiki.gg/images/thumb/Knight_Black.png/64px-Knight_Black.png?8c2f00",
+    "PAWN": "https://peak.wiki.gg/images/thumb/Pawn_Black.png/64px-Pawn_Black.png?8c2f00",
+    "QUEEN": "https://peak.wiki.gg/images/thumb/Queen_Black.png/64px-Queen_Black.png?8c2f00",
+    "ROOK": "https://peak.wiki.gg/images/thumb/Rook_Black.png/64px-Rook_Black.png?8c2f00",
+    "BIRD": "https://peak.wiki.gg/images/thumb/Cooked_Bird.png/192px-Cooked_Bird.png?ea44a3",
+    "STICK": "https://peak.wiki.gg/images/thumb/FireWood.png/64px-FireWood.png?852c2e",
+    "TORN PAGE": "https://peak.wiki.gg/images/thumb/Scroll.png/192px-Scroll.png?6a5530",
+    "COCONUT HALF": "https://peak.wiki.gg/images/thumb/Half-Coconut.png/192px-Half-Coconut.png?ff191b",
+    "ANTI-ROPE CANNON": "https://peak.wiki.gg/images/thumb/Anti-Rope_Cannon.png/192px-Anti-Rope_Cannon.png?1fa9f9",
+    "LOC: NAME_CHEATER'S COMPASS": "https://peak.wiki.gg/images/thumb/Warp_Compass.png/192px-Warp_Compass.png?eb4ff1    ",
+};
+
+
+function getWikiIcon(itemName) {
+    if (manualImageOverrides[itemName.toUpperCase()]) {
+        const overrideUrl = manualImageOverrides[itemName.toUpperCase()];
+        return `https://images.weserv.nl/?url=${encodeURIComponent(overrideUrl)}&default=https://lucide.dev/api/icons/package`;
+    }
+    
+    const formatted = itemName.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join('_');
+    
+    const wikiUrl = `https://peak.wiki.gg/images/thumb/${formatted}.png/64px-${formatted}.png`;
+    return `https://images.weserv.nl/?url=${encodeURIComponent(wikiUrl)}&default=https://lucide.dev/api/icons/x`;
+}
+
+function filterItems(query) {
+    const term = query.toLowerCase();
+    const items = document.querySelectorAll('.preset-item-card');
+    
+    items.forEach(item => {
+        const name = item.dataset.name.toLowerCase();
+        if (name.includes(term)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function filterListItems(listType) {
+    const items = document.querySelectorAll('.preset-item-card');
+    const selectedIds = currentChallenge[listType] || [];
+    
+    items.forEach(item => {
+        const itemId = parseInt(item.dataset.id);
+        if (selectedIds.includes(itemId)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function updateItemButtonState(itemId, listType, element) {
+    if (currentChallenge[listType].includes(itemId)) {
+        switch(listType) {
+            case 'disallowedItems':
+                element.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                element.classList.remove('border-[--color-border]');
+                break;
+            case 'allowedItemsOnly':
+                element.classList.add('bg-green-500', 'text-white', 'border-green-500');
+                element.classList.remove('border-[--color-border]');
+                break;
+            case 'oneTimeUseItems':
+                element.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+                element.classList.remove('border-[--color-border]');
+                break;
+        }
+    } else {
+        element.classList.remove('bg-red-500', 'text-white', 'border-red-500', 
+                                'bg-green-500', 'border-green-500', 
+                                'bg-blue-500', 'border-blue-500');
+        element.classList.add('border-[--color-border]');
+    }
+}
+
+function updatePresetOutput() {
+    document.getElementById('preset-json-output').textContent = JSON.stringify(currentChallenge, null, 2);
+}
+
+function updatePresetField(key, value) {
+    currentChallenge[key] = value;
+    savePresetCache();
+    updatePresetOutput();
+}
+
+const confirmed = {
+            'allowedItemsOnly': false,
+            'disallowedItems': false,
+            'oneTimeUseItems': false
+        }
+
+function toggleItemInList(itemIds, listType) {
+    const firstId = itemIds[0];
+    
+    if (currentChallenge[listType].includes(firstId)) {
+        currentChallenge[listType] = currentChallenge[listType].filter(id => !itemIds.includes(id));
+    } else {
+        const messages = {
+            'allowedItemsOnly': "⚠️ WHITELIST WARNING ⚠️\nOnly items in this list can be picked up. All other items will be ignored.\n\nAdd this item to the whitelist?",
+            'disallowedItems': "⚠️ BLACKLIST WARNING ⚠️\nItems in this list cannot be picked up.\n\nAdd this item to the blacklist?",
+            'oneTimeUseItems': "⚠️ ONE-TIME USE WARNING ⚠️\nThese items disappear forever after one use until a new run.\n\nAdd this item to the one-time use list?"
+        };
+
+        if (messages[listType] &&  confirmed[listType] !== true) {
+            if (confirm(messages[listType])) {
+                confirmed[listType] = true;
+                currentChallenge[listType].push(...itemIds);
+            } else {
+                return;
+            }
+        } else {
+            currentChallenge[listType].push(...itemIds);
+        }
+    }
+    
+    savePresetCache();
+    updatePresetOutput();
+    
+    const itemName = Object.keys(itemsData).find(key => itemsData[key][0] === firstId);
+    if (itemName) {
+        const itemCard = document.querySelector(`.preset-item-card[data-name="${itemName}"]`);
+        if (itemCard) {
+            const buttons = itemCard.querySelectorAll('button');
+            buttons.forEach((btn, idx) => {
+                const btnListType = ['disallowedItems', 'allowedItemsOnly', 'oneTimeUseItems'][idx];
+                updateItemButtonState(firstId, btnListType, btn);
+            });
+        }
+    }
+}
+
+function clearPresetConfig() {
+    if (confirm("Are you sure you want to clear ALL configuration? This will reset everything to default.")) {
+        currentChallenge = {
+            Name: "", Creators: "", Notes: "", MinAscent: -1, 
+            AllowHigherAscents: true, disallowedItems: [], 
+            oneTimeUseItems: [], allowedItemsOnly: [],
+            Itemless: false, DisableRopeTypes: false,
+            alwaysHaveTick: false, noMultiplayer: false,
+            minimumPlayers: 1, allowReserveStamina: true,
+            noSprinting: false, noJumping: false, noBackpack: false,
+            controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
+            controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
+        };
+        savePresetCache();
+        renderPeakPresetsPage();
+        alert("Configuration cleared to defaults!");
+    }
+}
+
+function importConfig() {
+    try {
+        const input = document.getElementById('import-json-area').value;
+        const parsed = JSON.parse(input);
+        currentChallenge = { ...currentChallenge, ...parsed };
+        savePresetCache();
+        renderPeakPresetsPage();
+        alert("Configuration Loaded Successfully!");
+    } catch (e) {
+        alert("Invalid JSON format. Please check your input.");
+    }
+}
+
+function resetItemFilter() {
+    const items = document.querySelectorAll('.preset-item-card');
+    items.forEach(item => {
+        item.style.display = 'block';
+    });
+}
+
+let itemsData = {};
+
+async function renderPeakPresetsPage() {
+    try {
+        const res = await fetch('https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/0802ccd517ba8a052631ea7ba0fd14d876edf48b/peak_list.json');
+        itemsData = await res.json();
+
+        contentDiv.innerHTML = `
+        <div class="page-transition flex flex-col lg:flex-row gap-8">
+            <div class="lg:w-1/3">
+                <div class="panel-block p-8 sticky top-8 flex flex-col min-h-[85vh] border-l-4 border-[--color-accent]">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl mx-auto flex items-center justify-center mb-4 shadow-xl">
+                            <i data-lucide="cog" class="w-10 h-10 text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">Challenge Creator</h3>
+                        <p class="text-xs text-[--color-subtle] uppercase tracking-widest mt-1">Config Editor</p>
+                    </div>
+
+                    <div class="space-y-4 flex-grow overflow-y-auto custom-scrollbar pr-2">
+                        <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
+                            <h4 class="font-bold text-green-500 text-xs uppercase mb-1">White (Whitelist)</h4>
+                            <p class="text-[10px] text-[--color-subtle]">Only these items can be picked up; all others are ignored.</p>
+                            <button onclick="filterListItems('allowedItemsOnly')" class="w-full mt-2 text-[8px] bg-green-500/20 text-green-500 py-1 rounded font-bold hover:bg-green-500/30 transition">
+                                Show Whitelisted Items (${currentChallenge.allowedItemsOnly.length})
+                            </button>
+                        </div>
+                        <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
+                            <h4 class="font-bold text-red-500 text-xs uppercase mb-1">Black (Blacklist)</h4>
+                            <p class="text-[10px] text-[--color-subtle]">These items are forbidden and cannot be picked up.</p>
+                            <button onclick="filterListItems('disallowedItems')" class="w-full mt-2 text-[8px] bg-red-500/20 text-red-500 py-1 rounded font-bold hover:bg-red-500/30 transition">
+                                Show Blacklisted Items (${currentChallenge.disallowedItems.length})
+                            </button>
+                        </div>
+                        <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
+                            <h4 class="font-bold text-blue-500 text-xs uppercase mb-1">1-Use (One Time)</h4>
+                            <p class="text-[10px] text-[--color-subtle]">Item disappears forever after one use until a new run.</p>
+                            <button onclick="filterListItems('oneTimeUseItems')" class="w-full mt-2 text-[8px] bg-blue-500/20 text-blue-500 py-1 rounded font-bold hover:bg-blue-500/30 transition">
+                                Show 1-Use Items (${currentChallenge.oneTimeUseItems.length})
+                            </button>
+                        </div>
+                        <button onclick="resetItemFilter()" class="w-full text-[8px] bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">
+                            Show All Items
+                        </button>
+                        <div class="border-t border-[--color-border] pt-4">
+                            <h4 class="text-xs font-bold uppercase mb-2 text-[--color-accent]">Import Config</h4>
+                            <textarea id="import-json-area" placeholder="Paste JSON here..." class="cla-step-input h-24 text-[10px] py-2"></textarea>
+                            <button onclick="importConfig()" class="w-full mt-2 text-xs bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Load JSON</button>
+                            <button onclick="clearPresetConfig()" class="w-full mt-2 text-xs bg-red-500/20 text-red-500 py-2 rounded font-bold hover:bg-red-500/30 transition">
+                                Clear All Configuration
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-[--color-border]">
+                        <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">
+                            Copy Final Config
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-2/3 space-y-6 pb-20">
+                <details open class="panel-block group">
+                    <summary class="p-5 cursor-pointer font-bold text-lg flex items-center list-none select-none">
+                        <i data-lucide="edit-3" class="w-5 h-5 mr-3 text-[--color-accent]"></i> Details
+                        <i data-lucide="chevron-down" class="ml-auto w-4 h-4 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Challenge Name" class="cla-step-input" value="${currentChallenge.Name}" oninput="updatePresetField('Name', this.value)">
+                        <input type="text" placeholder="Creators" class="cla-step-input" value="${currentChallenge.Creators}" oninput="updatePresetField('Creators', this.value)">
+                        <textarea placeholder="Notes..." class="md:col-span-2 cla-step-input h-20 py-2" oninput="updatePresetField('Notes', this.value)">${currentChallenge.Notes}</textarea>
+                    </div>
+                </details>
+
+                <details class="panel-block group">
+                    <summary class="p-5 cursor-pointer font-bold text-lg flex items-center list-none select-none">
+                        <i data-lucide="zap" class="w-5 h-5 mr-3 text-[--color-accent]"></i> Modifiers
+                        <i data-lucide="chevron-down" class="ml-auto w-4 h-4 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="px-6 pb-6 pt-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mb-6">
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">No Sprinting</span>
+                                <input type="checkbox" ${currentChallenge.noSprinting ? 'checked' : ''} 
+                                       onchange="updatePresetField('noSprinting', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">No Jumping</span>
+                                <input type="checkbox" ${currentChallenge.noJumping ? 'checked' : ''} 
+                                       onchange="updatePresetField('noJumping', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Itemless</span>
+                                <input type="checkbox" ${currentChallenge.Itemless ? 'checked' : ''} 
+                                       onchange="updatePresetField('Itemless', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Always Have Tick</span>
+                                <input type="checkbox" ${currentChallenge.alwaysHaveTick ? 'checked' : ''} 
+                                       onchange="updatePresetField('alwaysHaveTick', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">No Multiplayer</span>
+                                <input type="checkbox" ${currentChallenge.noMultiplayer ? 'checked' : ''} 
+                                       onchange="updatePresetField('noMultiplayer', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">No Backpack</span>
+                                <input type="checkbox" ${currentChallenge.noBackpack ? 'checked' : ''} 
+                                       onchange="updatePresetField('noBackpack', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Allow Higher Acents</span>
+                                <input type="checkbox" ${currentChallenge.AllowHigherAscents ? 'checked' : ''} 
+                                       onchange="updatePresetField('AllowHigherAscents', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Disable Rope, Chains & Vines</span>
+                                <input type="checkbox" ${currentChallenge.DisableRopeTypes ? 'checked' : ''} 
+                                       onchange="updatePresetField('DisableRopeTypes', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Allow Reserve Stamina</span>
+                                <input type="checkbox" ${currentChallenge.allowReserveStamina ? 'checked' : ''} 
+                                       onchange="updatePresetField('allowReserveStamina', this.checked)" 
+                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Lock Left/Right (Ground)</span>
+                                <input type="checkbox" ${currentChallenge.controlLockLeftAndRight_Ground ? 'checked' : ''} 
+                                    onchange="updatePresetField('controlLockLeftAndRight_Ground', this.checked)" 
+                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Lock Forward/Back (Ground)</span>
+                                <input type="checkbox" ${currentChallenge.controlLockForwardAndBackward_Ground ? 'checked' : ''} 
+                                    onchange="updatePresetField('controlLockForwardAndBackward_Ground', this.checked)" 
+                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Lock Left/Right (Climb)</span>
+                                <input type="checkbox" ${currentChallenge.controlLockLeftAndRight_Climb ? 'checked' : ''} 
+                                    onchange="updatePresetField('controlLockLeftAndRight_Climb', this.checked)" 
+                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Lock Forward/Back (Climb)</span>
+                                <input type="checkbox" ${currentChallenge.controlLockForwardAndBackward_Climb ? 'checked' : ''} 
+                                    onchange="updatePresetField('controlLockForwardAndBackward_Climb', this.checked)" 
+                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[--color-border] pt-4">
+                            <div>
+                                <label class="text-[10px] font-bold uppercase text-[--color-subtle]">Min Ascent (-1 = Tenderfoot)</label>
+                                <input type="number" class="cla-step-input" value="${currentChallenge.MinAscent}" oninput="updatePresetField('MinAscent', parseInt(this.value))">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold uppercase text-[--color-subtle]">Minimum Players</label>
+                                <input type="number" class="cla-step-input" value="${currentChallenge.minimumPlayers}" oninput="updatePresetField('minimumPlayers', parseInt(this.value))">
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <details open class="panel-block group">
+                    <summary class="p-5 cursor-pointer font-bold text-lg flex items-center list-none select-none">
+                        <i data-lucide="package" class="w-5 h-5 mr-3 text-[--color-accent]"></i> Item Database
+                        <i data-lucide="chevron-down" class="ml-auto w-4 h-4 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="px-6 pb-6 pt-2">
+                        <input type="text" placeholder="Search items..." class="cla-step-input w-full mb-4 px-4" oninput="filterItems(this.value)">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                            ${Object.entries(itemsData).map(([name, ids]) => {
+                                const isBlacklisted = currentChallenge.disallowedItems.includes(ids[0]);
+                                const isWhitelisted = currentChallenge.allowedItemsOnly.includes(ids[0]);
+                                const isOneTime = currentChallenge.oneTimeUseItems.includes(ids[0]);
+                                
+                                return `
+                                <div class="preset-item-card border border-[--color-border] rounded-xl p-3 flex flex-col gap-2" data-name="${name}" data-id="${ids[0]}">
+                                    <div class="flex items-center gap-3">
+                                        <img src="${getWikiIcon(name)}" 
+                                             class="w-8 h-8 object-contain">
+                                        <span class="text-[10px] font-black uppercase flex-1 leading-tight">${name}</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button onclick="toggleItemInList([${ids}], 'disallowedItems')" class="flex-1 text-[8px] p-1 rounded font-bold border ${isBlacklisted ? 'bg-red-500 text-white border-red-500' : 'border-[--color-border]'}">Black</button>
+                                        <button onclick="toggleItemInList([${ids}], 'allowedItemsOnly')" class="flex-1 text-[8px] p-1 rounded font-bold border ${isWhitelisted ? 'bg-green-500 text-white border-green-500' : 'border-[--color-border]'}">White</button>
+                                        <button onclick="toggleItemInList([${ids}], 'oneTimeUseItems')" class="flex-1 text-[8px] p-1 rounded font-bold border ${isOneTime ? 'bg-blue-500 text-white border-blue-500' : 'border-[--color-border]'}">1-Use</button>
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </details>
+
+                <pre id="preset-json-output" class="panel-block p-6 text-[10px] font-mono text-amber-200 overflow-x-auto whitespace-pre-wrap">${JSON.stringify(currentChallenge, null, 2)}</pre>
+            </div>
+        </div>
+        `;
+        lucide.createIcons();
+    } catch (error) {
+        console.error("Failed to load items data:", error);
+        contentDiv.innerHTML = `
+        <div class="page-transition">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8">Peak Presets</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">Failed to load items data. Please try again later.</p>
+        </div>
+        `;
+    }
+}
+
+function copyPresetsToClipboard() {
+    const text = document.getElementById('preset-json-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Challenge Config Copied to Clipboard!');
+    });
+}
+
 function renderLevelingPage() {
-  contentDiv.innerHTML =  `
+    contentDiv.innerHTML = `
     <div class="page-transition">
-      <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Leveling XP Calculator</h2>
-      <p class="text-lg text-[--color-subtle] mb-8">Calculate the exact XP needed to reach your target level with the Leveling mod.</p>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left Sidebar: Mod Information -->
-        <div class="lg:col-span-1 panel-block p-6 flex flex-col">
-          <div class="flex flex-col items-center mb-6">
-            <img
-              src="https://gcdn.thunderstore.io/live/repository/icons/AtomicStudio-Leveling-0.2.0.png.128x128_q95.png"
-              class="w-32 h-32 rounded-2xl shadow-xl mb-4"
-              alt="Leveling Mod Icon"
-            />
-            <h3 class="text-2xl font-extrabold text-[--color-accent] text-center mb-2">Leveling</h3>
-            <p class="text-sm text-[--color-subtle] text-center font-semibold">by AtomicStudio</p>
-            <span class="text-xs text-[--color-text-main] bg-[--color-subtle]/20 px-3 py-1 rounded-full mt-2">v0.2.0</span>
-          </div>
-          
-          <div class="flex-grow space-y-4 mb-6">
-            <div class="border-t border-[--color-border] pt-4">
-              <h4 class="text-sm font-bold text-[--color-text-main] mb-2 flex items-center">
-                <i data-lucide="info" class="w-4 h-4 mr-2 text-[--color-accent]"></i>
-                About This Mod
-              </h4>
-              <p class="text-sm text-[--color-subtle] leading-relaxed">
-                The Leveling mod adds a progressive XP and leveling system to PEAK. Gain experience through gameplay and unlock new levels!
-              </p>
+        <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Leveling XP Calculator</h2>
+        <p class="text-lg text-[--color-subtle] mb-8">Calculate the exact XP needed to reach your target level with the Leveling mod.</p>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1 panel-block p-6 flex flex-col">
+                <div class="flex flex-col items-center mb-6">
+                    <img src="https://gcdn.thunderstore.io/live/repository/icons/AtomicStudio-Leveling-0.2.0.png.128x128_q95.png" class="w-32 h-32 rounded-2xl shadow-xl mb-4" alt="Leveling Mod Icon">
+                    <h3 class="text-2xl font-extrabold text-[--color-accent] text-center mb-2">Leveling</h3>
+                    <p class="text-sm text-[--color-subtle] text-center font-semibold">by AtomicStudio</p>
+                    <span class="text-xs text-[--color-text-main] bg-[--color-subtle]/20 px-3 py-1 rounded-full mt-2">v0.2.0</span>
+                </div>
+                
+                <div class="flex-grow space-y-4 mb-6">
+                    <div class="border-t border-[--color-border] pt-4">
+                        <h4 class="text-sm font-bold text-[--color-text-main] mb-2 flex items-center">
+                            <i data-lucide="info" class="w-4 h-4 mr-2 text-[--color-accent]"></i>
+                            About This Mod
+                        </h4>
+                        <p class="text-sm text-[--color-subtle] leading-relaxed">
+                            The Leveling mod adds a progressive XP and leveling system to PEAK. Gain experience through gameplay and unlock new levels!
+                        </p>
+                    </div>
+                    
+                    <div class="border-t border-[--color-border] pt-4">
+                        <h4 class="text-sm font-bold text-[--color-text-main] mb-3 flex items-center">
+                            <i data-lucide="calculator" class="w-4 h-4 mr-2 text-[--color-accent]"></i>
+                            XP Formula
+                        </h4>
+                        <div class="bg-[--color-primary-bg] p-3 rounded-lg font-mono text-xs text-[--color-text-main] border border-[--color-border]">
+                            XP per level = Level × 100
+                        </div>
+                        <div class="bg-[--color-primary-bg] p-3 rounded-lg font-mono text-xs text-[--color-text-main] border border-[--color-border]">
+                            Total XP = 50×(T²−T−S²+S)
+                        </div>
+                        <p class="text-xs text-[--color-subtle] mt-2 italic">
+                            This formula calculates total XP required from starting level S to target level T.
+                        </p>
+                    </div>
+                </div>
+                
+                <a href="https://thunderstore.io/c/peak/p/AtomicStudio/Leveling/" target="_blank" class="w-full bg-[--color-accent] text-white font-bold py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-300 flex items-center justify-center">
+                    <i data-lucide="external-link" class="w-5 h-5 mr-2"></i>
+                    View on Thunderstore
+                </a>
             </div>
-            
-            <div class="border-t border-[--color-border] pt-4">
-              <h4 class="text-sm font-bold text-[--color-text-main] mb-3 flex items-center">
-                <i data-lucide="calculator" class="w-4 h-4 mr-2 text-[--color-accent]"></i>
-                XP Formula
-              </h4>
-              <div class="bg-[--color-primary-bg] p-3 rounded-lg font-mono text-xs text-[--color-text-main] border border-[--color-border]">
-                XP = Level × 100
-              </div>
-              <div class="bg-[--color-primary-bg] p-3 rounded-lg font-mono text-xs text-[--color-text-main] border border-[--color-border]">
-                Total XP = 50×(T²−T−S²+S)
-              </div>
-              <p class="text-xs text-[--color-subtle] mt-2 italic">
-                This is the forumla used to calculate total XP required from starting level S to target level T.
-              </p>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="panel-block p-6">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i data-lucide="target" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
+                        Calculate XP Requirements
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
+                                <i data-lucide="arrow-up-from-line" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
+                                Start Level
+                            </label>
+                            <input id="leveling-start" type="number" min="0" placeholder="0" class="cla-step-input text-xl font-bold">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
+                                <i data-lucide="flag" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
+                                Target Level
+                            </label>
+                            <input id="leveling-end" type="number" min="1" placeholder="10" class="cla-step-input text-xl font-bold">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
+                                <i data-lucide="zap" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
+                                Current XP
+                            </label>
+                            <input id="leveling-xp" type="number" min="0" placeholder="0" class="cla-step-input text-xl font-bold">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center">
+                        <button onclick="updateLevelingXP()" class="px-8 py-3 rounded-full font-bold text-lg bg-[--color-accent] text-white shadow-lg hover:scale-105 transition duration-300 flex items-center">
+                            <i data-lucide="calculator" class="w-5 h-5 mr-2"></i>
+                            Calculate XP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-block p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="trophy" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
+                        Results
+                    </h3>
+                    <div id="leveling-result" class="text-center py-12 text-2xl font-extrabold text-[--color-subtle] opacity-0 transition-opacity duration-300">
+                        Enter values above
+                    </div>
+                </div>
+                
+                <div class="panel-block p-6 bg-gradient-to-br from-[--color-subtle]/10 to-transparent">
+                    <h3 class="text-lg font-bold mb-3 flex items-center">
+                        <i data-lucide="lightbulb" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
+                        Quick Tips
+                    </h3>
+                    <ul class="space-y-2 text-sm text-[--color-text-main]">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
+                            <span>Each level requires progressively more XP (Level × 100)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
+                            <span>Current XP is subtracted from the total requirement</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
+                            <span>Use this tool to plan your progression goals!</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </div>
-          
-          <a
-            href="https://thunderstore.io/c/peak/p/AtomicStudio/Leveling/"
-            target="_blank"
-            class="w-full bg-[--color-accent] text-white font-bold py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-300 flex items-center justify-center"
-          >
-            <i data-lucide="external-link" class="w-5 h-5 mr-2"></i>
-            View on Thunderstore
-          </a>
         </div>
-
-        <!-- Right Side: Calculator -->
-        <div class="lg:col-span-2 space-y-6">
-          <div class="panel-block p-6">
-            <h3 class="text-xl font-bold mb-6 flex items-center">
-              <i data-lucide="target" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
-              Calculate XP Requirements
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
-                  <i data-lucide="arrow-up-from-line" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
-                  Start Level
-                </label>
-                <input
-                  id="leveling-start"
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  class="cla-step-input text-xl font-bold"
-                />
-              </div>
-              
-              <div>
-                <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
-                  <i data-lucide="flag" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
-                  Target Level
-                </label>
-                <input
-                  id="leveling-end"
-                  type="number"
-                  min="1"
-                  placeholder="10"
-                  class="cla-step-input text-xl font-bold"
-                />
-              </div>
-              
-              <div>
-                <label class="block text-sm font-semibold text-[--color-text-main] mb-2">
-                  <i data-lucide="zap" class="w-4 h-4 inline mr-1 text-[--color-accent]"></i>
-                  Current XP
-                </label>
-                <input
-                  id="leveling-xp"
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  class="cla-step-input text-xl font-bold"
-                />
-              </div>
-            </div>
-
-            <div class="flex justify-center">
-              <button
-                onclick="updateLevelingXP()"
-                class="px-8 py-3 rounded-full font-bold text-lg bg-[--color-accent] text-white shadow-lg hover:scale-105 transition duration-300 flex items-center"
-              >
-                <i data-lucide="calculator" class="w-5 h-5 mr-2"></i>
-                Calculate XP
-              </button>
-            </div>
-          </div>
-
-          <div class="panel-block p-6">
-            <h3 class="text-xl font-bold mb-4 flex items-center">
-              <i data-lucide="trophy" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
-              Results
-            </h3>
-            <div
-              id="leveling-result"
-              class="text-center py-12 text-2xl font-extrabold text-[--color-subtle] opacity-0 transition-opacity duration-300"
-            >
-              Placeholder_INVIS
-            </div>
-          </div>
-          
-          <div class="panel-block p-6 bg-gradient-to-br from-[--color-subtle]/10 to-transparent">
-            <h3 class="text-lg font-bold mb-3 flex items-center">
-              <i data-lucide="lightbulb" class="w-5 h-5 mr-2 text-[--color-accent]"></i>
-              Quick Tips
-            </h3>
-            <ul class="space-y-2 text-sm text-[--color-text-main]">
-              <li class="flex items-start">
-                <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
-                <span>Each level requires progressively more XP (Level × 100)</span>
-              </li>
-              <li class="flex items-start">
-                <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
-                <span>Current XP is subtracted from the total requirement</span>
-              </li>
-              <li class="flex items-start">
-                <i data-lucide="check" class="w-4 h-4 mr-2 mt-0.5 text-green-500 flex-shrink-0"></i>
-                <span>Use this tool to plan your progression goals!</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
-  `;
-  lucide.createIcons();
+    `;
+    lucide.createIcons();
 }
 
 function calculateXP(startLevel, endLevel, currentXP = 0.0) {
-  let totalXP = 0;
-
-  for (let level = startLevel; level < endLevel; level++) {
-    totalXP += level * 100;
-  }
-
-  return totalXP - currentXP;
+    let totalXP = 0;
+    for (let level = startLevel; level < endLevel; level++) {
+        totalXP += level * 100;
+    }
+    return totalXP - currentXP;
 }
 
 function updateLevelingXP() {
-  const start = parseInt(document.getElementById("leveling-start").value);
-  const end = parseInt(document.getElementById("leveling-end").value);
-  const currentXP =
-    parseInt(document.getElementById("leveling-xp").value) || 0;
+    const start = parseInt(document.getElementById("leveling-start").value) || 0;
+    const end = parseInt(document.getElementById("leveling-end").value) || 0;
+    const currentXP = parseInt(document.getElementById("leveling-xp").value) || 0;
+    const result = document.getElementById("leveling-result");
 
-  const result = document.getElementById("leveling-result");
+    if (isNaN(start) || isNaN(end) || end <= start) {
+        result.textContent = "Please enter a valid target level higher than start level.";
+        result.classList.remove("opacity-0");
+        return;
+    }
 
-  if (isNaN(start) || isNaN(end) || end <= start) {
-    result.textContent = "Please enter a bigger target level than start level.";
+    const xpNeeded = calculateXP(start, end, currentXP);
+    result.textContent = `Experience Needed: ${xpNeeded.toLocaleString()}`;
     result.classList.remove("opacity-0");
-    return;
-  }
-
-  const xpNeeded = calculateXP(start, end, currentXP);
-
-  result.textContent = `Experience Needed: ${xpNeeded.toLocaleString()}`;
-  result.classList.remove("opacity-0");
 }
-
 
 function updateClaButtonStates() {
     const playBtn = document.getElementById('cla-play-btn');
@@ -882,9 +1283,7 @@ function updateClaPreviewLight(step) {
     const lightElement = document.getElementById('cla-preview-light');
     if (!lightElement) return;
 
-    if (step === null) {
-        return;
-    }
+    if (step === null) return;
 
     const r = Math.round(step.r);
     const g = Math.round(step.g);
@@ -962,7 +1361,6 @@ function updateClaContent() {
         updateClaPreviewLight(CLA_STATE.steps[0]);
     }
 }
-
 
 window.copyClaToClipboard = () => {
     const dataString = formatClaSteps(CLA_STATE.steps);
@@ -1042,7 +1440,6 @@ window.deleteAllClaSteps = () => {
         showMessage('cla-message', 'All steps deleted. Default step restored.', 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900');
     }
 };
-
 
 window.deleteClaStep = (index) => {
     if (CLA_STATE.steps.length > 1 && confirm("Are you sure you want to delete this animation step?")) {
@@ -1144,146 +1541,146 @@ function renderClaStep(step, index) {
     const hex = rgbToHex(step.r, step.g, step.b);
     const opacity = step.a * 100;
     return `
-                <div id="cla-step-${index}" class="cla-step-card panel-block p-4 mb-4 flex items-center shadow-lg flame-border">
-                    <div class="flex-grow grid grid-cols-12 gap-4 items-center">
-                        <div class="col-span-1 text-center font-bold text-xl text-[--color-accent]">${index + 1}</div>
+        <div id="cla-step-${index}" class="cla-step-card panel-block p-4 mb-4 flex items-center shadow-lg flame-border">
+            <div class="flex-grow grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-1 text-center font-bold text-xl text-[--color-accent]">${index + 1}</div>
 
-                        <div class="col-span-4 flex flex-col space-y-2">
-                            <div class="flex items-center space-x-3">
-                                <label class="font-semibold text-sm">Color Picker:</label>
-                                <input type="color" value="${hex}" 
-                                       onchange="updateClaStepColor(${index}, this.value)" 
-                                       class="w-8 h-8 rounded-full cursor-pointer focus:ring-2 focus:ring-[--color-accent] p-0 m-0 border-none"> 
-                            </div>
-                            
-                            <div class="flex items-center space-x-1">
-                                <label class="text-xs font-semibold">R</label>
-                                <input type="number" min="0" max="255" value="${step.r}" 
-                                       onchange="updateClaStepRgb(${index}, 'r', this.value)" 
-                                       class="cla-step-input w-1/4 !p-1 text-center">
-                                <label class="text-xs font-semibold">G</label>
-                                <input type="number" min="0" max="255" value="${step.g}" 
-                                       onchange="updateClaStepRgb(${index}, 'g', this.value)" 
-                                       class="cla-step-input w-1/4 !p-1 text-center">
-                                <label class="text-xs font-semibold">B</label>
-                                <input type="number" min="0" max="255" value="${step.b}" 
-                                       onchange="updateClaStepRgb(${index}, 'b', this.value)" 
-                                       class="cla-step-input w-1/4 !p-1 text-center">
-                            </div>
-                        </div>
-                        
-                        <div class="col-span-3">
-                            <label for="ms-${index}" class="font-semibold text-sm block mb-1">Duration (ms):</label>
-                            <input id="ms-${index}" type="number" min="100" step="50" max="10000" value="${step.ms}" 
-                                   onchange="updateClaStepMs(${index}, this.value)" 
-                                   class="cla-step-input">
-                        </div>
-                        
-                        <div class="col-span-3">
-                            <label class="font-semibold text-sm block mb-1">Alpha (0.00 - 1.00):</label>
-                            <div class="flex items-center space-x-2">
-                                <input id="alpha-${index}" type="number" min="0" max="1" step="0.01" value="${step.a.toFixed(2)}" 
-                                       onchange="updateClaStepAlpha(${index}, this.value)" 
-                                       class="cla-step-input w-1/3 !p-1 text-center">
-                                <input type="range" min="0" max="100" value="${opacity.toFixed(0)}" 
-                                       oninput="updateClaStepOpacitySlider(${index}, this.value)" 
-                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-[--color-accent]">
-                            </div>
-                        </div>
-                        
-                        <div class="col-span-1 flex flex-col items-center justify-center space-y-1">
-                            <button onclick="deleteClaStep(${index})" class="text-red-500 hover:text-red-700 p-1 transition duration-150" title="Delete Step">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
-                            <div class="flex flex-col space-y-1 mt-2">
-                                ${index > 0 ? `<button onclick="moveClaStep(${index}, -1)" class="text-[--color-text-main] hover:text-[--color-accent] p-1 transition duration-150" title="Move Up"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>` : ''}
-                                ${index < CLA_STATE.steps.length - 1 ? `<button onclick="moveClaStep(${index}, 1)" class="text-[--color-text-main] hover:text-[--color-accent] p-1 transition duration-150" title="Move Down"><i data-lucide="arrow-down" class="w-4 h-4"></i></button>` : ''}
-                            </div>
-                        </div>
+                <div class="col-span-4 flex flex-col space-y-2">
+                    <div class="flex items-center space-x-3">
+                        <label class="font-semibold text-sm">Color Picker:</label>
+                        <input type="color" value="${hex}" 
+                               onchange="updateClaStepColor(${index}, this.value)" 
+                               class="w-8 h-8 rounded-full cursor-pointer focus:ring-2 focus:ring-[--color-accent] p-0 m-0 border-none"> 
+                    </div>
+                    
+                    <div class="flex items-center space-x-1">
+                        <label class="text-xs font-semibold">R</label>
+                        <input type="number" min="0" max="255" value="${step.r}" 
+                               onchange="updateClaStepRgb(${index}, 'r', this.value)" 
+                               class="cla-step-input w-1/4 !p-1 text-center">
+                        <label class="text-xs font-semibold">G</label>
+                        <input type="number" min="0" max="255" value="${step.g}" 
+                               onchange="updateClaStepRgb(${index}, 'g', this.value)" 
+                               class="cla-step-input w-1/4 !p-1 text-center">
+                        <label class="text-xs font-semibold">B</label>
+                        <input type="number" min="0" max="255" value="${step.b}" 
+                               onchange="updateClaStepRgb(${index}, 'b', this.value)" 
+                               class="cla-step-input w-1/4 !p-1 text-center">
                     </div>
                 </div>
-            `;
+                
+                <div class="col-span-3">
+                    <label for="ms-${index}" class="font-semibold text-sm block mb-1">Duration (ms):</label>
+                    <input id="ms-${index}" type="number" min="100" step="50" max="10000" value="${step.ms}" 
+                           onchange="updateClaStepMs(${index}, this.value)" 
+                           class="cla-step-input">
+                </div>
+                
+                <div class="col-span-3">
+                    <label class="font-semibold text-sm block mb-1">Alpha (0.00 - 1.00):</label>
+                    <div class="flex items-center space-x-2">
+                        <input id="alpha-${index}" type="number" min="0" max="1" step="0.01" value="${step.a.toFixed(2)}" 
+                               onchange="updateClaStepAlpha(${index}, this.value)" 
+                               class="cla-step-input w-1/3 !p-1 text-center">
+                        <input type="range" min="0" max="100" value="${opacity.toFixed(0)}" 
+                               oninput="updateClaStepOpacitySlider(${index}, this.value)" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-[--color-accent]">
+                    </div>
+                </div>
+                
+                <div class="col-span-1 flex flex-col items-center justify-center space-y-1">
+                    <button onclick="deleteClaStep(${index})" class="text-red-500 hover:text-red-700 p-1 transition duration-150" title="Delete Step">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                    <div class="flex flex-col space-y-1 mt-2">
+                        ${index > 0 ? `<button onclick="moveClaStep(${index}, -1)" class="text-[--color-text-main] hover:text-[--color-accent] p-1 transition duration-150" title="Move Up"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>` : ''}
+                        ${index < CLA_STATE.steps.length - 1 ? `<button onclick="moveClaStep(${index}, 1)" class="text-[--color-text-main] hover:text-[--color-accent] p-1 transition duration-150" title="Move Down"><i data-lucide="arrow-down" class="w-4 h-4"></i></button>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function renderClaPage() {
     const presets = Object.keys(CLA_PRESETS).map(key => `
-                <button onclick="loadClaPreset('${key}')" class="w-full bg-[--color-background-panel] hover:bg-[--color-border] border border-[--color-border] text-[--color-text-main] py-2 px-4 rounded-lg text-sm font-semibold transition duration-300">
-                    ${key}
-                </button>
-            `).join('');
+        <button onclick="loadClaPreset('${key}')" class="w-full bg-[--color-background-panel] hover:bg-[--color-border] border border-[--color-border] text-[--color-text-main] py-2 px-4 rounded-lg text-sm font-semibold transition duration-300">
+            ${key}
+        </button>
+    `).join('');
 
     contentDiv.innerHTML = `
-                <div class="page-transition">
-                    <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Cozy Lights Animator</h2>
-                    <p class="text-lg text-[--color-subtle] mb-8">Visually create animation steps for the Cozy Lights mod and copy the resulting string into your config file.</p>
-                    
-                    <div class="flex space-x-4 mb-6">
-                        <button onclick="window.copyClaToClipboard()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                            <i data-lucide="clipboard" class="w-5 h-5 mr-2 inline"></i>Copy to Clipboard
-                        </button>
-                        <button onclick="window.importClaFromClipboard()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                            <i data-lucide="file-input" class="w-5 h-5 mr-2 inline"></i>Import Animation
-                        </button>
-                    </div>
-                    <div id="cla-message" class="text-center transition-opacity duration-500" style="opacity: 0;"></div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <div class="lg:col-span-1 panel-block p-6">
-                            <h3 class="text-xl font-bold mb-4 flex items-center">
-                                <i data-lucide="eye" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Live Preview
-                            </h3>
-                            <div class="light-preview-container">
-                                <div id="cla-preview-light" 
-                                     class="w-24 h-24 rounded-full" 
-                                     style="background-color: rgba(0,0,0,0); transition: background-color 0s, box-shadow 0s; box-shadow: 0 0 20px var(--color-accent)80;">
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 flex justify-between space-x-4">
-                                <button id="cla-play-btn" onclick="startClaAnimation()" class="flex-1 bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition duration-300">
-                                    <i data-lucide="play" class="w-5 h-5 mr-1 inline"></i> Play
-                                </button>
-                                <button id="cla-stop-btn" onclick="stopClaAnimation()" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg hover:bg-red-600 transition duration-300">
-                                    <i data-lucide="square" class="w-5 h-5 mr-1 inline"></i> Stop
-                                </button>
-                            </div>
-
-                            <h4 class="text-lg font-bold mt-6 mb-4 border-t border-[--color-border] pt-4">Presets</h4>
-                            <div class="flex flex-col space-y-2">
-                                ${presets}
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-2">
-                             <h3 class="text-xl font-bold mb-4 flex items-center">
-                                <i data-lucide="list-ordered" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Animation Steps (${CLA_STATE.steps.length} total)
-                            </h3>
-                            <div id="cla-steps-scroll-container" class="max-h-[34rem] overflow-y-auto pr-2">
-                                <div id="cla-steps-container">
-                                    ${CLA_STATE.steps.map(renderClaStep).join('')}
-                                </div>
-                            </div>
-                            <div class="flex space-x-4 mt-4">
-                                <button onclick="addClaStep()" class="flex-1 border-2 border-dashed border-[--color-subtle] text-[--color-text-main] py-3 rounded-lg hover:bg-[--color-subtle]/30 transition duration-300 font-semibold flex items-center justify-center">
-                                    <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Add New Step
-                                </button>
-                                <button onclick="deleteAllClaSteps()" class="w-1/3 border-2 border-dashed border-red-500/50 text-red-500 py-3 rounded-lg hover:bg-red-500/10 transition duration-300 font-semibold flex items-center justify-center">
-                                    <i data-lucide="trash-2" class="w-5 h-5 mr-2"></i> Delete All
-                                </button>
-                            </div>
+        <div class="page-transition">
+            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8 border-b-2 border-[--color-border] pb-2">Cozy Lights Animator</h2>
+            <p class="text-lg text-[--color-subtle] mb-8">Visually create animation steps for the Cozy Lights mod and copy the resulting string into your config file.</p>
+            
+            <div class="flex space-x-4 mb-6">
+                <button onclick="window.copyClaToClipboard()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                    <i data-lucide="clipboard" class="w-5 h-5 mr-2 inline"></i>Copy to Clipboard
+                </button>
+                <button onclick="window.importClaFromClipboard()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                    <i data-lucide="file-input" class="w-5 h-5 mr-2 inline"></i>Import Animation
+                </button>
+            </div>
+            <div id="cla-message" class="text-center transition-opacity duration-500" style="opacity: 0;"></div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-1 panel-block p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="eye" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Live Preview
+                    </h3>
+                    <div class="light-preview-container">
+                        <div id="cla-preview-light" 
+                             class="w-24 h-24 rounded-full" 
+                             style="background-color: rgba(0,0,0,0); transition: background-color 0s, box-shadow 0s; box-shadow: 0 0 20px var(--color-accent)80;">
                         </div>
                     </div>
                     
-                    <div class="panel-block p-6 mt-6">
-                        <h3 class="text-xl font-bold mb-4 flex items-center">
-                            <i data-lucide="code" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Animation String Output
-                        </h3>
-                        <div class="bg-gray-100 dark:bg-gray-500 p-4 rounded-lg font-mono text-sm break-all">
-                            ${formatClaSteps(CLA_STATE.steps)}
-                        </div>
+                    <div class="mt-6 flex justify-between space-x-4">
+                        <button id="cla-play-btn" onclick="startClaAnimation()" class="flex-1 bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                            <i data-lucide="play" class="w-5 h-5 mr-1 inline"></i> Play
+                        </button>
+                        <button id="cla-stop-btn" onclick="stopClaAnimation()" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg hover:bg-red-600 transition duration-300">
+                            <i data-lucide="square" class="w-5 h-5 mr-1 inline"></i> Stop
+                        </button>
+                    </div>
+
+                    <h4 class="text-lg font-bold mt-6 mb-4 border-t border-[--color-border] pt-4">Presets</h4>
+                    <div class="flex flex-col space-y-2">
+                        ${presets}
                     </div>
                 </div>
-            `;
+
+                <div class="lg:col-span-2">
+                     <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="list-ordered" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Animation Steps (${CLA_STATE.steps.length} total)
+                    </h3>
+                    <div id="cla-steps-scroll-container" class="max-h-[34rem] overflow-y-auto pr-2">
+                        <div id="cla-steps-container">
+                            ${CLA_STATE.steps.map(renderClaStep).join('')}
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <button onclick="addClaStep()" class="flex-1 border-2 border-dashed border-[--color-subtle] text-[--color-text-main] py-3 rounded-lg hover:bg-[--color-subtle]/30 transition duration-300 font-semibold flex items-center justify-center">
+                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Add New Step
+                        </button>
+                        <button onclick="deleteAllClaSteps()" class="w-1/3 border-2 border-dashed border-red-500/50 text-red-500 py-3 rounded-lg hover:bg-red-500/10 transition duration-300 font-semibold flex items-center justify-center">
+                            <i data-lucide="trash-2" class="w-5 h-5 mr-2"></i> Delete All
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-block p-6 mt-6">
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <i data-lucide="code" class="w-5 h-5 mr-2 text-[--color-accent]"></i> Animation String Output
+                </h3>
+                <div class="bg-gray-100 dark:bg-gray-500 p-4 rounded-lg font-mono text-sm break-all">
+                    ${formatClaSteps(CLA_STATE.steps)}
+                </div>
+            </div>
+        </div>
+    `;
     lucide.createIcons();
     updateClaButtonStates();
     updateClaPreviewLight(CLA_STATE.steps[0]);
@@ -1292,7 +1689,7 @@ function renderClaPage() {
 async function initializeApp() {
     const initialPage = window.location.hash.substring(1) || 'home';
 
-    if (['home', 'communities', 'projects', 'tools', 'cla'].includes(initialPage)) {
+    if (['home', 'communities', 'projects', 'tools', 'cla', 'leveling', 'peakPresets'].includes(initialPage)) {
         navigate(initialPage);
     } else {
         navigate('home');
@@ -1330,7 +1727,7 @@ window.onload = () => {
 
     window.addEventListener('hashchange', () => {
         const page = window.location.hash.substring(1) || 'home';
-        if (['home', 'communities', 'projects', 'tools', 'cla', 'leveling'].includes(page)) {
+        if (['home', 'communities', 'projects', 'tools', 'cla', 'leveling', 'peakPresets'].includes(page)) {
             navigate(page);
         } else {
             navigate('home');
@@ -1352,7 +1749,6 @@ function rickroll() {
         overlay.classList.remove('konami-hidden');
 
         video.play().catch(error => {
-            console.warn("Autoplay blocked. Attempting to play muted.", error);
             video.muted = true;
             video.play().catch(e => {
                 console.error("Failed to play video even muted. User must interact.", e);
