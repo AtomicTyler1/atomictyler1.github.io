@@ -685,7 +685,7 @@ let currentChallenge = JSON.parse(localStorage.getItem('peak_preset_cache')) || 
     alwaysHaveTick: false, noMultiplayer: false,
     minimumPlayers: 1, allowReserveStamina: true,
     noSprinting: false, noJumping: false, noBackpack: false,
-    controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
+    startSkeleton: false, controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
     controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
 };
 
@@ -853,7 +853,7 @@ function clearPresetConfig() {
             Itemless: false, DisableRopeTypes: false,
             alwaysHaveTick: false, noMultiplayer: false,
             minimumPlayers: 1, allowReserveStamina: true,
-            noSprinting: false, noJumping: false, noBackpack: false,
+            noSprinting: false, noJumping: false, noBackpack: false, startSkeleton: false,
             controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
             controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
         };
@@ -1018,6 +1018,12 @@ async function renderPeakPresetsPage() {
                                 <input type="checkbox" ${currentChallenge.allowReserveStamina ? 'checked' : ''} 
                                        onchange="updatePresetField('allowReserveStamina', this.checked)" 
                                        class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+                                <span class="text-sm font-medium">Start Skeleton</span>
+                                <input type="checkbox" ${currentChallenge.startSkeleton ? 'checked' : ''} 
+                                    onchange="updatePresetField('startSkeleton', this.checked)" 
+                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
                             </div>
                             <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
                                 <span class="text-sm font-medium">Lock Left/Right (Ground)</span>
