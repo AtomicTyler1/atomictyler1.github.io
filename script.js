@@ -748,8 +748,26 @@ function createTooltip(text) {
     `;
 }
 
+function getMinimalConfig(config) {
+    const defaults = getDefaultChallenge();
+    const minimal = {};
+
+    Object.keys(config).forEach(key => {
+        const val = config[key];
+        const def = defaults[key];
+
+        if (Array.isArray(val)) {
+            if (val.length > 0) minimal[key] = val;
+        } else if (val !== def) {
+            minimal[key] = val;
+        }
+    });
+
+    return minimal;
+}
+
 async function exportAsShortcode() {
-    const jsonConfig = currentChallenge; 
+    const jsonConfig = getMinimalConfig(currentChallenge);
     
     const btn = document.getElementById('shortcode-btn');
     const resultDiv = document.getElementById('shortcode-result');
@@ -889,7 +907,7 @@ function toggleBadge(badgeId) {
 }
 
 function copyPresetsToClipboard() {
-    const jsonString = JSON.stringify(currentChallenge, null, 2);
+    const jsonString = JSON.stringify(getMinimalConfig(currentChallenge), null, 2);
 
     const textArea = document.createElement("textarea");
     textArea.value = jsonString;
@@ -969,7 +987,10 @@ function filterBadges(searchTerm) {
 
 function updatePresetOutput() {
     const output = document.getElementById('preset-json-output');
-    if (output) output.textContent = JSON.stringify(currentChallenge, null, 2);
+    if (output) {
+        const minimal = getMinimalConfig(currentChallenge);
+        output.textContent = JSON.stringify(minimal, null, 2);
+    }
 }
 
 function clearPresetConfig() {
