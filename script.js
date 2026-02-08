@@ -826,6 +826,27 @@ function toggleBadge(badgeId) {
     filterBadges(document.getElementById('badge-search')?.value || "");
 }
 
+function copyPresetsToClipboard() {
+    const jsonString = JSON.stringify(currentChallenge, null, 2);
+
+    const textArea = document.createElement("textarea");
+    textArea.value = jsonString;
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        const btn = event.target;
+        btn.innerText = "✓ Copied!";
+        setTimeout(() => btn.innerText = "Copy Final Config", 2000);
+    } catch (err) {
+        alert("Manual copy required: Check console.");
+        console.log(jsonString);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
 function filterBadges(searchTerm) {
     const container = document.getElementById('badge-selection-container');
     if (container) {
