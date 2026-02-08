@@ -847,6 +847,84 @@ function clearPresetConfig() {
     }
 }
 
+function toggleItemInList(itemIds, listKey) {
+    const ids = Array.isArray(itemIds) ? itemIds : [itemIds];
+    const firstId = ids[0];
+    const index = currentChallenge[listKey].indexOf(firstId);
+
+    if (index > -1) {
+        currentChallenge[listKey] = currentChallenge[listKey].filter(id => !ids.includes(id));
+    } else {
+        currentChallenge[listKey] = [...currentChallenge[listKey], ...ids];
+        
+        if (listKey === 'allowedItemsOnly') {
+            currentChallenge.disallowedItems = currentChallenge.disallowedItems.filter(id => !ids.includes(id));
+        } else if (listKey === 'disallowedItems') {
+            currentChallenge.allowedItemsOnly = currentChallenge.allowedItemsOnly.filter(id => !ids.includes(id));
+        }
+    }
+    savePresetCache();
+    updatePresetOutput();
+    updateItemCardUI(firstId);
+}
+
+function filterListItems(listKey) {
+    const items = document.querySelectorAll('.preset-item-card');
+    const targetIds = currentChallenge[listKey] || [];
+
+    items.forEach(item => {
+        const itemId = parseInt(item.getAttribute('data-id'));
+        if (targetIds.includes(itemId)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function resetItemFilter() {
+    const items = document.querySelectorAll('.preset-item-card');
+    items.forEach(item => item.style.display = 'flex');
+}
+
+function filterItems(searchTerm) {
+    const items = document.querySelectorAll('.preset-item-card');
+    const term = searchTerm.toLowerCase();
+
+    items.forEach(item => {
+        const name = item.getAttribute('data-name').toLowerCase();
+        if (name.includes(term)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function updateItemCardUI(id) {
+    const card = document.querySelector(`.preset-item-card[data-id="${id}"]`);
+    if (!card) return;
+
+    const isBlack = currentChallenge.disallowedItems.includes(id);
+    const isWhite = currentChallenge.allowedItemsOnly.includes(id);
+    const isOneTime = currentChallenge.oneTimeUseItems.includes(id);
+
+    const setBtnState = (btn, isActive, activeClass) => {
+        if (isActive) {
+            btn.classList.add(activeClass, 'text-white');
+            btn.classList.remove('border-[--color-border]');
+        } else {
+            btn.classList.remove(activeClass, 'text-white');
+            btn.classList.add('border-[--color-border]');
+        }
+    };
+
+    const buttons = card.querySelectorAll('button');
+    setBtnState(buttons[0], isBlack, 'bg-red-500');
+    setBtnState(buttons[1], isWhite, 'bg-green-500');
+    setBtnState(buttons[2], isOneTime, 'bg-blue-500');
+}
+
 async function renderPeakPresetsPage() {
     try {
         const [itemsRes, badgesRes] = await Promise.all([
