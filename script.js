@@ -678,32 +678,62 @@ function renderToolsPage() {
     lucide.createIcons();
 }
 
-let currentChallenge = JSON.parse(localStorage.getItem('peak_preset_cache')) || {
-    Name: "", Creators: "", Notes: "", MinAscent: -1, 
-    AllowHigherAscents: true, disallowedItems: [], 
-    oneTimeUseItems: [], allowedItemsOnly: [],
-    Itemless: false, DisableRopeTypes: false,
-    alwaysHaveTick: false, noMultiplayer: false,
-    minimumPlayers: 1, allowReserveStamina: true,
-    noSprinting: false, noJumping: false, noBackpack: false,
-    startSkeleton: false, controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
-    controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
-};
+const modifierDefinitions = [
+    { key: 'noSprinting', label: 'No Sprinting', default: false, tooltip: "If true, you cannot sprint" },
+    { key: 'noJumping', label: 'No Jumping', default: false, tooltip: "If true, you cannot jump. This should also disable ropes and chains." },
+    { key: 'Itemless', label: 'Itemless', default: false, tooltip: "Can't use items except flare and 1 use of an item" },
+    { key: 'alwaysHaveTick', label: 'Always Have Tick', default: false, tooltip: "You will always have a tick attached to you" },
+    { key: 'noMultiplayer', label: 'No Multiplayer', default: false, tooltip: "You can only play singleplayer" },
+    { key: 'noBackpack', label: 'No Backpack', default: false, tooltip: "If true, you cannot use a backpack" },
+    { key: 'AllowHigherAscents', label: 'Allow Higher Ascents', default: true, tooltip: "If minAscent is 4, can they do 5, 6 and above?" },
+    { key: 'DisableRopeTypes', label: 'Disable Rope, Chains & Vines', default: false, tooltip: "If true, all rope, chains and vines are disabled." },
+    { key: 'allowReserveStamina', label: 'Allow Reserve Stamina', default: true, tooltip: "If false all reserve stamina is removed upon gaining it" },
+    { key: 'startSkeleton', label: 'Start Skeleton', default: false, tooltip: "If true, you start the run as a skeleton." },
+    { key: 'controlLockLeftAndRight_Ground', label: 'Lock Left/Right (Ground)', default: false, tooltip: "If true, you can only move left and right on the ground" },
+    { key: 'controlLockForwardAndBackward_Ground', label: 'Lock Forward/Back (Ground)', default: false, tooltip: "If true, you can only move forward and backward on the ground" },
+    { key: 'controlLockLeftAndRight_Climb', label: 'Lock Left/Right (Climb)', default: false, tooltip: "If true, you can only move left and right whilst climbing" },
+    { key: 'controlLockForwardAndBackward_Climb', label: 'Lock Forward/Back (Climb)', default: false, tooltip: "If true, you can only move forward and backward whilst climbing" },
+    { key: 'endRunOnCurse', label: 'End Run on Curse', default: false, tooltip: "If true, the run will end if you get the curse affliction" },
+    { key: 'noLuggages', label: 'No Luggages', default: false, tooltip: "If true, you cannot open luggages." },
+    { key: 'noAncientStatues', label: 'No Ancient Statues', default: false, tooltip: "If true, you cannot interact with ancient statues at all." },
+    { key: 'noCampfireHealAndMorale', label: 'No Campfire Heal/Morale', default: false, tooltip: "If true, you cannot heal or gain morale from campfires." },
+    { key: 'temporaryStatusesDecay', label: 'Temporary Statuses Decay', default: true, tooltip: "If true, statuses like cold, heat, and poison will decay normally." }
+];
+
+function getDefaultChallenge() {
+    let base = {
+        Name: "", Creators: "", Notes: "", MinAscent: -1, minimumPlayers: 1,
+        disallowedItems: [], oneTimeUseItems: [], allowedItemsOnly: [], requiredBadges: []
+    };
+    modifierDefinitions.forEach(mod => base[mod.key] = mod.default);
+    return base;
+}
+
+let badgeData = {};
+let itemsData = {};
+let currentChallenge = JSON.parse(localStorage.getItem('peak_preset_cache')) || getDefaultChallenge();
 
 function savePresetCache() {
     localStorage.setItem('peak_preset_cache', JSON.stringify(currentChallenge));
 }
 
-function formatItemNameForWiki(itemName) {
-    return itemName.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join('_');
+function createTooltip(text) {
+    return `
+        <span class="relative inline-flex items-center ml-2">
+            <i data-lucide="help-circle" 
+               class="w-4 h-4 text-[--color-subtle] cursor-help peer"></i>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-xl 
+                        opacity-0 pointer-events-none peer-hover:opacity-100 transition-opacity duration-200 w-48 z-50 text-center font-normal">
+                ${text}
+                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+            </div>
+        </span>
+    `;
 }
 
 let manualImageOverrides = {
     "ANTI-ROPE SPOOL": "https://peak.wiki.gg/images/thumb/Anti-Rope_Spool.png/64px-Anti-Rope_Spool.png?ae4d5d",
     "THE BOOK OF BONES": "https://peak.wiki.gg/images/thumb/The_Book_of_Bones.png/64px-The_Book_of_Bones.png?90f081",
-    "BUGLE OF FRIENDSHIP": "https://peak.wiki.gg/images/thumb/Bugle_of_Friendship.png/64px-Bugle_of_Friendship.png?ae33da",
     "BUGLE OF FRIENDSHIP": "https://peak.wiki.gg/images/thumb/Bugle_of_Friendship.png/64px-Bugle_of_Friendship.png?ae33da",
     "CURE-ALL": "https://peak.wiki.gg/images/thumb/Cure-All.png/64px-Cure-All.png?de867e",
     "GREEN CLUSTERBERRY": "https://peak.wiki.gg/images/thumb/Clusterberry_Green.png/64px-Clusterberry_Green.png?b366c0",
@@ -719,177 +749,98 @@ let manualImageOverrides = {
     "TORN PAGE": "https://peak.wiki.gg/images/thumb/Scroll.png/192px-Scroll.png?6a5530",
     "COCONUT HALF": "https://peak.wiki.gg/images/thumb/Half-Coconut.png/192px-Half-Coconut.png?ff191b",
     "ANTI-ROPE CANNON": "https://peak.wiki.gg/images/thumb/Anti-Rope_Cannon.png/192px-Anti-Rope_Cannon.png?1fa9f9",
-    "LOC: NAME_CHEATER'S COMPASS": "https://peak.wiki.gg/images/thumb/Warp_Compass.png/192px-Warp_Compass.png?eb4ff1    ",
 };
-
 
 function getWikiIcon(itemName) {
     if (manualImageOverrides[itemName.toUpperCase()]) {
-        const overrideUrl = manualImageOverrides[itemName.toUpperCase()];
-        return `https://images.weserv.nl/?url=${encodeURIComponent(overrideUrl)}&default=https://lucide.dev/api/icons/package`;
+        return `https://images.weserv.nl/?url=${encodeURIComponent(manualImageOverrides[itemName.toUpperCase()])}&default=https://lucide.dev/api/icons/package`;
     }
-    
-    const formatted = itemName.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join('_');
-    
+    const formatted = itemName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('_');
     const wikiUrl = `https://peak.wiki.gg/images/thumb/${formatted}.png/64px-${formatted}.png`;
     return `https://images.weserv.nl/?url=${encodeURIComponent(wikiUrl)}&default=https://lucide.dev/api/icons/x`;
 }
 
-function filterItems(query) {
-    const term = query.toLowerCase();
-    const items = document.querySelectorAll('.preset-item-card');
-    
-    items.forEach(item => {
-        const name = item.dataset.name.toLowerCase();
-        if (name.includes(term)) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
-        }
-    });
+function renderModifierCheckboxes() {
+    return modifierDefinitions.map(mod => `
+        <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
+            <div class="flex items-center">
+                <span class="text-sm font-medium text-[--color-text-main]">${mod.label}</span>
+                ${createTooltip(mod.tooltip)}
+            </div>
+            <input type="checkbox" ${currentChallenge[mod.key] ? 'checked' : ''} 
+                   onchange="updatePresetField('${mod.key}', this.checked)" 
+                   class="w-4 h-4 accent-[--color-accent] cursor-pointer">
+        </div>
+    `).join('');
 }
 
-function filterListItems(listType) {
-    const items = document.querySelectorAll('.preset-item-card');
-    const selectedIds = currentChallenge[listType] || [];
+function renderBadgeSelection(searchTerm = "") {
+    const badgesHTML = Object.entries(badgeData)
+        .filter(([name]) => name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .map(([name, id]) => {
+            const isSelected = currentChallenge.requiredBadges.includes(id);
+            return `
+                <div class="flex items-center gap-3 p-2 hover:bg-[--color-background-panel] rounded cursor-pointer ${isSelected ? 'bg-green-500/10' : ''}" 
+                     onclick="toggleBadge(${id})">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-500 to-yellow-700 rounded-lg flex items-center justify-center">
+                        <i data-lucide="award" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <span class="text-sm font-medium flex-1">${name}</span>
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} class="w-4 h-4 accent-[--color-accent]">
+                </div>
+            `;
+        }).join('');
     
-    items.forEach(item => {
-        const itemId = parseInt(item.dataset.id);
-        if (selectedIds.includes(itemId)) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
-        }
-    });
+    return badgesHTML || `<p class="text-[10px] text-center w-full py-4 text-[--color-subtle]">No badges found...</p>`;
 }
 
-function updateItemButtonState(itemId, listType, element) {
-    if (currentChallenge[listType].includes(itemId)) {
-        switch(listType) {
-            case 'disallowedItems':
-                element.classList.add('bg-red-500', 'text-white', 'border-red-500');
-                element.classList.remove('border-[--color-border]');
-                break;
-            case 'allowedItemsOnly':
-                element.classList.add('bg-green-500', 'text-white', 'border-green-500');
-                element.classList.remove('border-[--color-border]');
-                break;
-            case 'oneTimeUseItems':
-                element.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
-                element.classList.remove('border-[--color-border]');
-                break;
-        }
+function updatePresetField(field, value) {
+    currentChallenge[field] = value;
+    savePresetCache();
+    updatePresetOutput();
+}
+
+function toggleBadge(badgeId) {
+    const index = currentChallenge.requiredBadges.indexOf(badgeId);
+    if (index > -1) {
+        currentChallenge.requiredBadges.splice(index, 1);
     } else {
-        element.classList.remove('bg-red-500', 'text-white', 'border-red-500', 
-                                'bg-green-500', 'border-green-500', 
-                                'bg-blue-500', 'border-blue-500');
-        element.classList.add('border-[--color-border]');
+        currentChallenge.requiredBadges.push(badgeId);
+    }
+    savePresetCache();
+    updatePresetOutput();
+    filterBadges(document.getElementById('badge-search')?.value || "");
+}
+
+function filterBadges(searchTerm) {
+    const container = document.getElementById('badge-selection-container');
+    if (container) {
+        container.innerHTML = renderBadgeSelection(searchTerm);
+        lucide.createIcons();
     }
 }
 
 function updatePresetOutput() {
-    document.getElementById('preset-json-output').textContent = JSON.stringify(currentChallenge, null, 2);
-}
-
-function updatePresetField(key, value) {
-    currentChallenge[key] = value;
-    savePresetCache();
-    updatePresetOutput();
-}
-
-const confirmed = {
-            'allowedItemsOnly': false,
-            'disallowedItems': false,
-            'oneTimeUseItems': false
-        }
-
-function toggleItemInList(itemIds, listType) {
-    const firstId = itemIds[0];
-    
-    if (currentChallenge[listType].includes(firstId)) {
-        currentChallenge[listType] = currentChallenge[listType].filter(id => !itemIds.includes(id));
-    } else {
-        const messages = {
-            'allowedItemsOnly': "⚠️ WHITELIST WARNING ⚠️\nOnly items in this list can be picked up. All other items will be ignored.\n\nAdd this item to the whitelist?",
-            'disallowedItems': "⚠️ BLACKLIST WARNING ⚠️\nItems in this list cannot be picked up.\n\nAdd this item to the blacklist?",
-            'oneTimeUseItems': "⚠️ ONE-TIME USE WARNING ⚠️\nThese items disappear forever after one use until a new run.\n\nAdd this item to the one-time use list?"
-        };
-
-        if (messages[listType] &&  confirmed[listType] !== true) {
-            if (confirm(messages[listType])) {
-                confirmed[listType] = true;
-                currentChallenge[listType].push(...itemIds);
-            } else {
-                return;
-            }
-        } else {
-            currentChallenge[listType].push(...itemIds);
-        }
-    }
-    
-    savePresetCache();
-    updatePresetOutput();
-    
-    const itemName = Object.keys(itemsData).find(key => itemsData[key][0] === firstId);
-    if (itemName) {
-        const itemCard = document.querySelector(`.preset-item-card[data-name="${itemName}"]`);
-        if (itemCard) {
-            const buttons = itemCard.querySelectorAll('button');
-            buttons.forEach((btn, idx) => {
-                const btnListType = ['disallowedItems', 'allowedItemsOnly', 'oneTimeUseItems'][idx];
-                updateItemButtonState(firstId, btnListType, btn);
-            });
-        }
-    }
+    const output = document.getElementById('preset-json-output');
+    if (output) output.textContent = JSON.stringify(currentChallenge, null, 2);
 }
 
 function clearPresetConfig() {
-    if (confirm("Are you sure you want to clear ALL configuration? This will reset everything to default.")) {
-        currentChallenge = {
-            Name: "", Creators: "", Notes: "", MinAscent: -1, 
-            AllowHigherAscents: true, disallowedItems: [], 
-            oneTimeUseItems: [], allowedItemsOnly: [],
-            Itemless: false, DisableRopeTypes: false,
-            alwaysHaveTick: false, noMultiplayer: false,
-            minimumPlayers: 1, allowReserveStamina: true,
-            noSprinting: false, noJumping: false, noBackpack: false, startSkeleton: false,
-            controlLockLeftAndRight_Ground: false, controlLockForwardAndBackward_Ground: false,
-            controlLockLeftAndRight_Climb: false, controlLockForwardAndBackward_Climb: false,
-        };
+    if (confirm("Are you sure you want to clear ALL configuration?")) {
+        currentChallenge = getDefaultChallenge();
         savePresetCache();
         renderPeakPresetsPage();
-        alert("Configuration cleared to defaults!");
     }
 }
-
-function importConfig() {
-    try {
-        const input = document.getElementById('import-json-area').value;
-        const parsed = JSON.parse(input);
-        currentChallenge = { ...currentChallenge, ...parsed };
-        savePresetCache();
-        renderPeakPresetsPage();
-        alert("Configuration Loaded Successfully!");
-    } catch (e) {
-        alert("Invalid JSON format. Please check your input.");
-    }
-}
-
-function resetItemFilter() {
-    const items = document.querySelectorAll('.preset-item-card');
-    items.forEach(item => {
-        item.style.display = 'block';
-    });
-}
-
-let itemsData = {};
 
 async function renderPeakPresetsPage() {
     try {
-        const res = await fetch('https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/0802ccd517ba8a052631ea7ba0fd14d876edf48b/peak_list.json');
-        itemsData = await res.json();
+        const [itemsRes, badgesRes] = await Promise.all([
+            fetch('https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/0802ccd517ba8a052631ea7ba0fd14d876edf48b/peak_list.json'),
+            fetch('https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/f5769a75669aa3cfd8492744e105be97b07a1e5c/peak_list_badges.json')
+        ]);
+        itemsData = await itemsRes.json();
+        badgeData = await badgesRes.json();
 
         contentDiv.innerHTML = `
         <div class="page-transition flex flex-col lg:flex-row gap-8">
@@ -906,42 +857,27 @@ async function renderPeakPresetsPage() {
                     <div class="space-y-4 flex-grow overflow-y-auto custom-scrollbar pr-2">
                         <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
                             <h4 class="font-bold text-green-500 text-xs uppercase mb-1">White (Whitelist)</h4>
-                            <p class="text-[10px] text-[--color-subtle]">Only these items can be picked up; all others are ignored.</p>
-                            <button onclick="filterListItems('allowedItemsOnly')" class="w-full mt-2 text-[8px] bg-green-500/20 text-green-500 py-1 rounded font-bold hover:bg-green-500/30 transition">
-                                Show Whitelisted Items (${currentChallenge.allowedItemsOnly.length})
-                            </button>
+                            <button onclick="filterListItems('allowedItemsOnly')" class="w-full mt-2 text-[8px] bg-green-500/20 text-green-500 py-1 rounded font-bold hover:bg-green-500/30 transition">Show Whitelisted</button>
                         </div>
                         <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
                             <h4 class="font-bold text-red-500 text-xs uppercase mb-1">Black (Blacklist)</h4>
-                            <p class="text-[10px] text-[--color-subtle]">These items are forbidden and cannot be picked up.</p>
-                            <button onclick="filterListItems('disallowedItems')" class="w-full mt-2 text-[8px] bg-red-500/20 text-red-500 py-1 rounded font-bold hover:bg-red-500/30 transition">
-                                Show Blacklisted Items (${currentChallenge.disallowedItems.length})
-                            </button>
+                            <button onclick="filterListItems('disallowedItems')" class="w-full mt-2 text-[8px] bg-red-500/20 text-red-500 py-1 rounded font-bold hover:bg-red-500/30 transition">Show Blacklisted</button>
                         </div>
                         <div class="p-3 bg-[--color-background-panel] rounded-lg border border-[--color-border]">
                             <h4 class="font-bold text-blue-500 text-xs uppercase mb-1">1-Use (One Time)</h4>
-                            <p class="text-[10px] text-[--color-subtle]">Item disappears forever after one use until a new run.</p>
-                            <button onclick="filterListItems('oneTimeUseItems')" class="w-full mt-2 text-[8px] bg-blue-500/20 text-blue-500 py-1 rounded font-bold hover:bg-blue-500/30 transition">
-                                Show 1-Use Items (${currentChallenge.oneTimeUseItems.length})
-                            </button>
+                            <button onclick="filterListItems('oneTimeUseItems')" class="w-full mt-2 text-[8px] bg-blue-500/20 text-blue-500 py-1 rounded font-bold hover:bg-blue-500/30 transition">Show 1-Use</button>
                         </div>
-                        <button onclick="resetItemFilter()" class="w-full text-[8px] bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">
-                            Show All Items
-                        </button>
+                        <button onclick="resetItemFilter()" class="w-full text-[8px] bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Show All Items</button>
+                        
                         <div class="border-t border-[--color-border] pt-4">
-                            <h4 class="text-xs font-bold uppercase mb-2 text-[--color-accent]">Import Config</h4>
                             <textarea id="import-json-area" placeholder="Paste JSON here..." class="cla-step-input h-24 text-[10px] py-2"></textarea>
                             <button onclick="importConfig()" class="w-full mt-2 text-xs bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Load JSON</button>
-                            <button onclick="clearPresetConfig()" class="w-full mt-2 text-xs bg-red-500/20 text-red-500 py-2 rounded font-bold hover:bg-red-500/30 transition">
-                                Clear All Configuration
-                            </button>
+                            <button onclick="clearPresetConfig()" class="w-full mt-2 text-xs bg-red-500/20 text-red-500 py-2 rounded font-bold hover:bg-red-500/30 transition">Clear All</button>
                         </div>
                     </div>
 
                     <div class="pt-6 border-t border-[--color-border]">
-                        <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">
-                            Copy Final Config
-                        </button>
+                        <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">Copy Final Config</button>
                     </div>
                 </div>
             </div>
@@ -966,90 +902,7 @@ async function renderPeakPresetsPage() {
                     </summary>
                     <div class="px-6 pb-6 pt-2">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mb-6">
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">No Sprinting</span>
-                                <input type="checkbox" ${currentChallenge.noSprinting ? 'checked' : ''} 
-                                       onchange="updatePresetField('noSprinting', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">No Jumping</span>
-                                <input type="checkbox" ${currentChallenge.noJumping ? 'checked' : ''} 
-                                       onchange="updatePresetField('noJumping', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Itemless</span>
-                                <input type="checkbox" ${currentChallenge.Itemless ? 'checked' : ''} 
-                                       onchange="updatePresetField('Itemless', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Always Have Tick</span>
-                                <input type="checkbox" ${currentChallenge.alwaysHaveTick ? 'checked' : ''} 
-                                       onchange="updatePresetField('alwaysHaveTick', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">No Multiplayer</span>
-                                <input type="checkbox" ${currentChallenge.noMultiplayer ? 'checked' : ''} 
-                                       onchange="updatePresetField('noMultiplayer', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">No Backpack</span>
-                                <input type="checkbox" ${currentChallenge.noBackpack ? 'checked' : ''} 
-                                       onchange="updatePresetField('noBackpack', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Allow Higher Acents</span>
-                                <input type="checkbox" ${currentChallenge.AllowHigherAscents ? 'checked' : ''} 
-                                       onchange="updatePresetField('AllowHigherAscents', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Disable Rope, Chains & Vines</span>
-                                <input type="checkbox" ${currentChallenge.DisableRopeTypes ? 'checked' : ''} 
-                                       onchange="updatePresetField('DisableRopeTypes', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Allow Reserve Stamina</span>
-                                <input type="checkbox" ${currentChallenge.allowReserveStamina ? 'checked' : ''} 
-                                       onchange="updatePresetField('allowReserveStamina', this.checked)" 
-                                       class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Start Skeleton</span>
-                                <input type="checkbox" ${currentChallenge.startSkeleton ? 'checked' : ''} 
-                                    onchange="updatePresetField('startSkeleton', this.checked)" 
-                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Lock Left/Right (Ground)</span>
-                                <input type="checkbox" ${currentChallenge.controlLockLeftAndRight_Ground ? 'checked' : ''} 
-                                    onchange="updatePresetField('controlLockLeftAndRight_Ground', this.checked)" 
-                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Lock Forward/Back (Ground)</span>
-                                <input type="checkbox" ${currentChallenge.controlLockForwardAndBackward_Ground ? 'checked' : ''} 
-                                    onchange="updatePresetField('controlLockForwardAndBackward_Ground', this.checked)" 
-                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Lock Left/Right (Climb)</span>
-                                <input type="checkbox" ${currentChallenge.controlLockLeftAndRight_Climb ? 'checked' : ''} 
-                                    onchange="updatePresetField('controlLockLeftAndRight_Climb', this.checked)" 
-                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
-                            <div class="flex items-center justify-between py-2 border-b border-[--color-border]/30">
-                                <span class="text-sm font-medium">Lock Forward/Back (Climb)</span>
-                                <input type="checkbox" ${currentChallenge.controlLockForwardAndBackward_Climb ? 'checked' : ''} 
-                                    onchange="updatePresetField('controlLockForwardAndBackward_Climb', this.checked)" 
-                                    class="w-4 h-4 accent-[--color-accent] cursor-pointer">
-                            </div>
+                            ${renderModifierCheckboxes()}
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[--color-border] pt-4">
                             <div>
@@ -1064,6 +917,19 @@ async function renderPeakPresetsPage() {
                     </div>
                 </details>
 
+                <details class="panel-block group">
+                    <summary class="p-5 cursor-pointer font-bold text-lg flex items-center list-none select-none">
+                        <i data-lucide="award" class="w-5 h-5 mr-3 text-[--color-accent]"></i> Required Badges
+                        <i data-lucide="chevron-down" class="ml-auto w-4 h-4 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="px-6 pb-6 pt-2">
+                        <input type="text" id="badge-search" placeholder="Search badges..." class="cla-step-input w-full mb-4 px-4 text-xs" oninput="filterBadges(this.value)">
+                        <div id="badge-selection-container" class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar p-2">
+                            ${renderBadgeSelection()}
+                        </div>
+                    </div>
+                </details>
+
                 <details open class="panel-block group">
                     <summary class="p-5 cursor-pointer font-bold text-lg flex items-center list-none select-none">
                         <i data-lucide="package" class="w-5 h-5 mr-3 text-[--color-accent]"></i> Item Database
@@ -1071,17 +937,15 @@ async function renderPeakPresetsPage() {
                     </summary>
                     <div class="px-6 pb-6 pt-2">
                         <input type="text" placeholder="Search items..." class="cla-step-input w-full mb-4 px-4" oninput="filterItems(this.value)">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                        <div id="items-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                             ${Object.entries(itemsData).map(([name, ids]) => {
                                 const isBlacklisted = currentChallenge.disallowedItems.includes(ids[0]);
                                 const isWhitelisted = currentChallenge.allowedItemsOnly.includes(ids[0]);
                                 const isOneTime = currentChallenge.oneTimeUseItems.includes(ids[0]);
-                                
                                 return `
                                 <div class="preset-item-card border border-[--color-border] rounded-xl p-3 flex flex-col gap-2" data-name="${name}" data-id="${ids[0]}">
                                     <div class="flex items-center gap-3">
-                                        <img src="${getWikiIcon(name)}" 
-                                             class="w-8 h-8 object-contain">
+                                        <img src="${getWikiIcon(name)}" class="w-8 h-8 object-contain">
                                         <span class="text-[10px] font-black uppercase flex-1 leading-tight">${name}</span>
                                     </div>
                                     <div class="flex gap-1">
@@ -1101,21 +965,8 @@ async function renderPeakPresetsPage() {
         `;
         lucide.createIcons();
     } catch (error) {
-        console.error("Failed to load items data:", error);
-        contentDiv.innerHTML = `
-        <div class="page-transition">
-            <h2 class="text-4xl font-extrabold text-[--color-text-main] mb-8">Peak Presets</h2>
-            <p class="text-lg text-[--color-subtle] mb-8">Failed to load items data. Please try again later.</p>
-        </div>
-        `;
+        console.error("Failed to load data:", error);
     }
-}
-
-function copyPresetsToClipboard() {
-    const text = document.getElementById('preset-json-output').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Challenge Config Copied to Clipboard!');
-    });
 }
 
 function renderLevelingPage() {
