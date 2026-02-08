@@ -847,6 +847,28 @@ function copyPresetsToClipboard() {
     document.body.removeChild(textArea);
 }
 
+function importConfig() {
+    const area = document.getElementById('import-json-area');
+    if (!area || !area.value.trim()) {
+        alert("Please paste a JSON configuration first.");
+        return;
+    }
+
+    try {
+        const imported = JSON.parse(area.value);
+        currentChallenge = { ...getDefaultChallenge(), ...imported };
+        
+        savePresetCache();
+        area.value = "";
+        renderPeakPresetsPage();
+        
+        alert("Configuration loaded successfully!");
+    } catch (e) {
+        console.error("Import Error:", e);
+        alert("Invalid JSON format. Please check your syntax.");
+    }
+}
+
 function filterBadges(searchTerm) {
     const container = document.getElementById('badge-selection-container');
     if (container) {
