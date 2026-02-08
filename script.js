@@ -702,16 +702,30 @@ const modifierDefinitions = [
 
 function getDefaultChallenge() {
     let base = {
-        Name: "", Creators: "", Notes: "", MinAscent: -1, minimumPlayers: 1,
-        disallowedItems: [], oneTimeUseItems: [], allowedItemsOnly: [], requiredBadges: []
+        Name: "", 
+        Creators: "", 
+        Notes: "", 
+        MinAscent: -1, 
+        minimumPlayers: 1,
+        disallowedItems: [], 
+        oneTimeUseItems: [], 
+        allowedItemsOnly: [], 
+        requiredBadges: []
     };
     modifierDefinitions.forEach(mod => base[mod.key] = mod.default);
     return base;
 }
 
+let cached = JSON.parse(localStorage.getItem('peak_preset_cache')) || {};
+let currentChallenge = { ...getDefaultChallenge(), ...cached };
+
+if (!currentChallenge.requiredBadges) currentChallenge.requiredBadges = [];
+if (!currentChallenge.disallowedItems) currentChallenge.disallowedItems = [];
+if (!currentChallenge.oneTimeUseItems) currentChallenge.oneTimeUseItems = [];
+if (!currentChallenge.allowedItemsOnly) currentChallenge.allowedItemsOnly = [];
+
 let badgeData = {};
 let itemsData = {};
-let currentChallenge = JSON.parse(localStorage.getItem('peak_preset_cache')) || getDefaultChallenge();
 
 function savePresetCache() {
     localStorage.setItem('peak_preset_cache', JSON.stringify(currentChallenge));
