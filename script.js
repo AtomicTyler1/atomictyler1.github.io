@@ -754,6 +754,11 @@ async function exportAsShortcode() {
     const btn = document.getElementById('shortcode-btn');
     const resultDiv = document.getElementById('shortcode-result');
     const display = document.getElementById('shortcode-display');
+
+    if(jsonConfig.Name.trim() === "" || jsonConfig.Creators.trim() === "") {
+        alert("Please provide a name/or creators for your challenge.");
+        return;
+    }
     
     if(btn) btn.innerText = "Generating...";
 
@@ -801,6 +806,7 @@ async function exportAsShortcode() {
         if(btn) btn.innerText = "Get Shortcode";
     }
 }
+
 let manualImageOverrides = {
     "ANTI-ROPE SPOOL": "https://peak.wiki.gg/images/thumb/Anti-Rope_Spool.png/64px-Anti-Rope_Spool.png?ae4d5d",
     "THE BOOK OF BONES": "https://peak.wiki.gg/images/thumb/The_Book_of_Bones.png/64px-The_Book_of_Bones.png?90f081",
