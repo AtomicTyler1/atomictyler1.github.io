@@ -45,6 +45,9 @@ const MOD_CACHE_EXPIRY_MS = 3600000 * 4;
 let CURRENT_SORT = { by: 'downloads', order: 'desc' };
 let CURRENT_FILTER = { community: 'All', platform: 'All' };
 
+// If you think you found something, its just a public API key, I'm not that dumb :P
+const supabaseClient = supabase.createClient('https://dujpxiwctslbpcziquqr.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1anB4aXdjdHNsYnBjemlxdXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MzkzMjIsImV4cCI6MjA4NjExNTMyMn0.FKJ3Mei_i3psMBkWbrZ11HwMuNl2h6-wEFloYGRkOnw');
+
 const DEFAULT_CLA_STEP = { r: 208, g: 163, b: 232, a: 1, ms: 1000 };
 
 const CLA_PRESETS = {
@@ -745,6 +748,59 @@ function createTooltip(text) {
     `;
 }
 
+async function exportAsShortcode() {
+    const jsonConfig = currentChallenge; 
+    
+    const btn = document.getElementById('shortcode-btn');
+    const resultDiv = document.getElementById('shortcode-result');
+    const display = document.getElementById('shortcode-display');
+    
+    if(btn) btn.innerText = "Generating...";
+
+    try {
+        const msgUint8 = new TextEncoder().encode(JSON.stringify(jsonConfig));
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        const { data: existing } = await supabaseClient
+            .from('challenges')
+            .select('id')
+            .eq('content_hash', hashHex)
+            .single();
+
+        let finalId = "";
+
+        if (existing) {
+            finalId = existing.id;
+        } else {
+            const shortId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const { error } = await supabaseClient
+                .from('challenges')
+                .insert([{ id: shortId, config: jsonConfig, content_hash: hashHex }]);
+            
+            if (error) throw error;
+            finalId = shortId;
+        }
+
+        const fullCode = "CHALLENGE_" + finalId;
+        
+        if (resultDiv && display) {
+            resultDiv.classList.remove('hidden');
+            display.innerText = fullCode;
+        } else {
+            alert("Your code is: " + fullCode);
+        }
+
+        if(btn) btn.innerText = "Get Shortcode";
+        
+        navigator.clipboard.writeText(fullCode);
+
+    } catch (e) {
+        console.error("Shortener Error:", e);
+        alert("Failed to generate code. Is Supabase set up correctly?");
+        if(btn) btn.innerText = "Get Shortcode";
+    }
+}
 let manualImageOverrides = {
     "ANTI-ROPE SPOOL": "https://peak.wiki.gg/images/thumb/Anti-Rope_Spool.png/64px-Anti-Rope_Spool.png?ae4d5d",
     "THE BOOK OF BONES": "https://peak.wiki.gg/images/thumb/The_Book_of_Bones.png/64px-The_Book_of_Bones.png?90f081",
@@ -847,26 +903,54 @@ function copyPresetsToClipboard() {
     document.body.removeChild(textArea);
 }
 
-function importConfig() {
+async function importConfig() {
     const area = document.getElementById('import-json-area');
-    if (!area || !area.value.trim()) {
-        alert("Please paste a JSON configuration first.");
+    const input = area.value.trim();
+
+    if (!input) {
+        alert("Please paste a JSON configuration or a Challenge Code.");
+        return;
+    }
+
+    if (input.startsWith("CHALLENGE_")) {
+        const shortId = input.replace("CHALLENGE_", "").toUpperCase();
+        
+        area.placeholder = "Fetching challenge...";
+        area.value = "";
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('challenges')
+                .select('config')
+                .eq('id', shortId)
+                .single();
+
+            if (error || !data) throw new Error("Challenge not found.");
+
+            applyImportedConfig(data.config);
+            alert(`Challenge '${data.config.Name}' loaded via code!`);
+        } catch (e) {
+            alert("Error: " + e.message);
+            area.placeholder = "Paste JSON or CHALLENGE_CODE here...";
+        }
         return;
     }
 
     try {
-        const imported = JSON.parse(area.value);
-        currentChallenge = { ...getDefaultChallenge(), ...imported };
-        
-        savePresetCache();
+        const imported = JSON.parse(input);
+        applyImportedConfig(imported);
         area.value = "";
-        renderPeakPresetsPage();
-        
-        alert("Configuration loaded successfully!");
+        alert("JSON configuration loaded successfully!");
     } catch (e) {
         console.error("Import Error:", e);
-        alert("Invalid JSON format. Please check your syntax.");
+        alert("Invalid format. Please paste a valid JSON or a CHALLENGE_ code.");
     }
+}
+
+function applyImportedConfig(configData) {
+    currentChallenge = { ...getDefaultChallenge(), ...configData };
+    savePresetCache();
+    renderPeakPresetsPage();
 }
 
 function filterBadges(searchTerm) {
@@ -1005,14 +1089,25 @@ async function renderPeakPresetsPage() {
                         <button onclick="resetItemFilter()" class="w-full text-[8px] bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Show All Items</button>
                         
                         <div class="border-t border-[--color-border] pt-4">
-                            <textarea id="import-json-area" placeholder="Paste JSON here..." class="cla-step-input h-24 text-[10px] py-2"></textarea>
-                            <button onclick="importConfig()" class="w-full mt-2 text-xs bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Load JSON</button>
+                            <textarea id="import-json-area" placeholder="Paste JSON or CODE here..." class="cla-step-input h-24 text-[10px] py-2"></textarea>
+                            <button onclick="importConfig()" class="w-full mt-2 text-xs bg-[--color-border] py-2 rounded font-bold hover:bg-[--color-accent] hover:text-white transition">Load Config</button>
                             <button onclick="clearPresetConfig()" class="w-full mt-2 text-xs bg-red-500/20 text-red-500 py-2 rounded font-bold hover:bg-red-500/30 transition">Clear All</button>
                         </div>
                     </div>
 
-                    <div class="pt-6 border-t border-[--color-border]">
-                        <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">Copy Final Config</button>
+                    <div class="pt-6 border-t border-[--color-border] space-y-3">
+                        <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-border] text-[--color-text-main] font-bold py-3 rounded-xl hover:bg-[--color-accent] hover:text-white transition">
+                            <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i> Copy Full JSON
+                        </button>
+                        
+                        <button id="shortcode-btn" onclick="exportAsShortcode()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">
+                            <i data-lucide="share-2" class="w-4 h-4 inline mr-2"></i> Get Shortcode
+                        </button>
+                        
+                        <div id="shortcode-result" class="hidden animate-pulse text-center p-3 bg-green-500/10 border border-green-500/50 rounded-lg">
+                            <span class="text-[10px] uppercase text-green-500 font-bold block">Challenge Code</span>
+                            <code id="shortcode-display" class="text-lg font-black text-white">-------</code>
+                        </div>
                     </div>
                 </div>
             </div>
