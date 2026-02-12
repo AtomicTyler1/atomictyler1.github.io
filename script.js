@@ -700,7 +700,9 @@ const modifierDefinitions = [
     { key: 'noLuggages', label: 'No Luggages', default: false, tooltip: "If true, you cannot open luggages." },
     { key: 'noAncientStatues', label: 'No Ancient Statues', default: false, tooltip: "If true, you cannot interact with ancient statues at all." },
     { key: 'noCampfireHealAndMorale', label: 'No Campfire Heal/Morale', default: false, tooltip: "If true, you cannot heal or gain morale from campfires." },
-    { key: 'temporaryStatusesDecay', label: 'Temporary Statuses Decay', default: true, tooltip: "If true, statuses like cold, heat, and poison will decay normally." }
+    { key: 'temporaryStatusesDecay', label: 'Temporary Statuses Decay', default: true, tooltip: "If true, statuses like cold, heat, and poison will decay normally." },
+    { key: 'cannotSeeStaminaBar', label: 'Cannot see stamina bar', default: false, tooltip: "If true, you have the mushroom effect on your stamina bar where you casnnot see your stamina bar (Numbness)" },
+    { key: 'alwaysNearSighted', label: 'Always Near Sighted', default: false, tooltip: "If true, you will always be near sighted. Good look finding a path being basically blind!" }
 ];
 
 function getDefaultChallenge() {
