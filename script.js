@@ -757,15 +757,22 @@ function getMinimalConfig(config) {
         const def = defaults[key];
 
         if (Array.isArray(val)) {
-            if (val.length > 0) minimal[key] = val;
-        } else if (val !== def) {
+            if (val.length > 0) {
+                minimal[key] = val;
+            }
+        } 
+        else if (typeof val === 'string') {
+            if (val.trim() !== "" && val !== def) {
+                minimal[key] = val;
+            }
+        }
+        else if (val !== def) {
             minimal[key] = val;
         }
     });
 
     return minimal;
 }
-
 async function exportAsShortcode() {
     const jsonConfig = getMinimalConfig(currentChallenge);
     
@@ -820,7 +827,7 @@ async function exportAsShortcode() {
 
     } catch (e) {
         console.error("Shortener Error:", e);
-        alert("Failed to generate code. Is Supabase set up correctly?");
+        alert("Failed to generate code. Plesae give your JSON to @atomictyler on discord.");
         if(btn) btn.innerText = "Get Shortcode";
     }
 }
@@ -1216,7 +1223,7 @@ async function renderPeakPresetsPage() {
                     </div>
                 </details>
 
-                <pre id="preset-json-output" class="panel-block p-6 text-[10px] font-mono text-amber-200 overflow-x-auto whitespace-pre-wrap">${JSON.stringify(currentChallenge, null, 2)}</pre>
+                <pre id="preset-json-output" class="panel-block p-6 text-[10px] font-mono text-amber-200 overflow-x-auto whitespace-pre-wrap">${JSON.stringify(getMinimalConfig(currentChallenge), null, 2)}</pre>
             </div>
         </div>
         `;
