@@ -24,6 +24,19 @@ const modifierDefinitions = [
     { key: 'alwaysNearSighted', label: 'Always Near Sighted', default: false, tooltip: "If true, you will always be near sighted. Good look finding a path being basically blind!" }
 ];
 
+const itemPresets = [
+    {
+        name: "Leave No Trace",
+        description: "Disallows all items that would disqualify the LNT badge",
+        disallowedItems: [1, 65, 63, 64, 62, 30, 18, 17, 107]
+    },
+    {
+        name: "Naturalist",
+        description: "Disallows all items that would disqualify the Naturalist badge",
+        disallowedItems: [0, 73, 66, 44, 139, 152, 33, 27]
+    }
+];
+
 let cached = JSON.parse(localStorage.getItem('peak_preset_cache')) || {};
 let currentChallenge = { ...getDefaultChallenge(), ...cached };
 
@@ -128,6 +141,125 @@ function updatePresetField(field, value) {
     currentChallenge[field] = value;
     savePresetCache();
     updatePresetOutput();
+}
+
+function applyItemPreset(index) {
+    const preset = itemPresets[index];
+    const isAlreadyActive = preset.disallowedItems.every(id => currentChallenge.disallowedItems.includes(id));
+
+    if (isAlreadyActive) {
+        currentChallenge.disallowedItems = currentChallenge.disallowedItems.filter(
+            id => !preset.disallowedItems.includes(id)
+        );
+        save_and_refresh_items();
+        return;
+    }
+    showPresetModal(preset);
+}
+
+function save_and_refresh_items() {
+    savePresetCache(); 
+    updatePresetOutput();
+    
+    refreshPresetButtonsUI();
+    
+    const cards = document.querySelectorAll('.preset-item-card');
+    cards.forEach(card => {
+        const id = parseInt(card.getAttribute('data-id'));
+        updateItemCardUI(id);
+    });
+}
+
+function refreshPresetButtonsUI() {
+    const container = document.querySelector('.flex.gap-3.overflow-x-auto.no-scrollbar');
+    if (!container) return;
+
+    container.innerHTML = itemPresets.map((preset, idx) => {
+        const isActive = preset.disallowedItems.every(id => currentChallenge.disallowedItems.includes(id));
+        const activeClasses = isActive 
+            ? 'border-green-500 bg-green-500/10 ring-2 ring-green-500/20' 
+            : 'border-[--color-border] bg-[--color-background-panel] opacity-70 hover:opacity-100';
+
+        return `
+            <button onclick="applyItemPreset(${idx})" 
+                    class="flex-shrink-0 px-4 py-2 border rounded-lg hover:border-[--color-accent] transition-all text-left min-w-[150px] ${activeClasses}">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="text-[10px] font-bold ${isActive ? 'text-green-500' : 'text-[--color-accent]'}">${preset.name}</div>
+                    ${isActive ? '<i data-lucide="check-circle-2" class="w-3 h-3 text-green-500"></i>' : '<i data-lucide="plus" class="w-3 h-3 text-[--color-subtle]"></i>'}
+                </div>
+                <div class="text-[9px] leading-tight text-[--color-subtle]">
+                    ${isActive ? 'Click to remove' : preset.disallowedItems.length + ' Items'}
+                </div>
+            </button>
+        `;
+    }).join('');
+    
+    lucide.createIcons();
+}
+
+function resetAllItems() {
+    if (confirm("Are you sure you want to clear the Blacklist, Whitelist, and 1-Use lists?")) {
+        currentChallenge.disallowedItems = [];
+        currentChallenge.allowedItemsOnly = [];
+        currentChallenge.oneTimeUseItems = [];
+        save_and_refresh_items();
+    }
+}
+
+function showPresetModal(preset) {
+    const modal = document.createElement('div');
+    modal.className = "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200";
+    modal.innerHTML = `
+        <div class="bg-[--color-background-panel] border border-[--color-border] rounded-2xl p-8 max-w-md w-full shadow-2xl scale-in-center">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-[--color-accent]/10 text-[--color-accent] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="package-plus" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Apply "${preset.name}"?</h3>
+                <p class="text-sm text-[--color-subtle] mt-2">${preset.description}</p>
+            </div>
+            
+            <div class="space-y-3">
+                <button id="merge-btn" class="w-full py-3 bg-[--color-accent] hover:bg-[--color-accent]/80 text-white rounded-xl font-bold transition-all flex flex-col items-center">
+                    <span>Merge with current list</span>
+                    <span class="text-[10px] opacity-70 font-normal">Adds items to your existing blacklist</span>
+                </button>
+                
+                <button id="override-btn" class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 rounded-xl font-bold transition-all flex flex-col items-center">
+                    <span>Override current list</span>
+                    <span class="text-[10px] opacity-70 font-normal">Wipes all current item settings first</span>
+                </button>
+                
+                <button id="cancel-btn" class="w-full py-2 text-[--color-subtle] hover:text-white text-sm transition-colors pt-2">
+                    Nevermind, keep things as they are
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    lucide.createIcons();
+
+    modal.querySelector('#merge-btn').onclick = () => {
+        const newDisallowed = new Set([...currentChallenge.disallowedItems, ...preset.disallowedItems]);
+        currentChallenge.disallowedItems = Array.from(newDisallowed);
+        currentChallenge.allowedItemsOnly = currentChallenge.allowedItemsOnly.filter(id => !preset.disallowedItems.includes(id));
+        closeAndRefresh();
+    };
+
+    modal.querySelector('#override-btn').onclick = () => {
+        currentChallenge.disallowedItems = [...preset.disallowedItems];
+        currentChallenge.allowedItemsOnly = [];
+        currentChallenge.oneTimeUseItems = [];
+        closeAndRefresh();
+    };
+
+    modal.querySelector('#cancel-btn').onclick = () => modal.remove();
+
+    function closeAndRefresh() {
+        modal.remove();
+        save_and_refresh_items();
+    }
 }
 
 function toggleBadge(badgeId) {
@@ -422,8 +554,10 @@ async function renderPeakPresetsPage() {
             <div class="lg:w-1/3">
                 <div class="panel-block p-8 sticky top-8 flex flex-col min-h-[85vh] border-l-4 border-[--color-accent]">
                     <div class="text-center mb-8">
-                        <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl mx-auto flex items-center justify-center mb-4 shadow-xl">
-                            <i data-lucide="cog" class="w-10 h-10 text-white"></i>
+                        <div class="w-20 h-20 bg-[--color-background-panel] rounded-3xl mx-auto flex items-center justify-center mb-4 shadow-xl overflow-hidden border border-[--color-border]">
+                            <img src="https://thunderstore.io/thumbnail-serve/repository/icons/AtomicStudio-ChallengeCreator-0.1.8.png/?width=128&height=128" 
+                                 alt="Challenge Creator Icon" 
+                                 class="w-full h-full object-cover">
                         </div>
                         <h3 class="text-2xl font-bold">Challenge Creator</h3>
                         <p class="text-xs text-[--color-subtle] uppercase tracking-widest mt-1">Config Editor</p>
@@ -452,6 +586,12 @@ async function renderPeakPresetsPage() {
                     </div>
 
                     <div class="pt-6 border-t border-[--color-border] space-y-3">
+                        <a href="https://thunderstore.io/c/peak/p/AtomicStudio/ChallengeCreator/" 
+                           target="_blank" 
+                           class="w-full bg-orange-600/10 text-orange-500 border border-orange-600/30 font-bold py-2 rounded-xl hover:bg-orange-600/20 transition flex items-center justify-center text-xs">
+                            <i data-lucide="external-link" class="w-3 h-3 mr-2"></i> View on Thunderstore
+                        </a>
+
                         <button onclick="copyPresetsToClipboard()" class="w-full bg-[--color-border] text-[--color-text-main] font-bold py-3 rounded-xl hover:bg-[--color-accent] hover:text-white transition">
                             <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i> Copy Full JSON
                         </button>
@@ -522,6 +662,33 @@ async function renderPeakPresetsPage() {
                         <i data-lucide="chevron-down" class="ml-auto w-4 h-4 transition-transform group-open:rotate-180"></i>
                     </summary>
                     <div class="px-6 pb-6 pt-2">
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-[10px] font-bold uppercase text-[--color-subtle]">Quick Item Presets</label>
+                                <button onclick="resetAllItems()" class="text-[9px] font-bold text-red-500 hover:underline">RESET ALL ITEMS</button>
+                            </div>
+                            <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
+                                ${itemPresets.map((preset, idx) => {
+                                    const isActive = preset.disallowedItems.every(id => currentChallenge.disallowedItems.includes(id));
+                                    const activeClasses = isActive 
+                                        ? 'border-green-500 bg-green-500/10 ring-2 ring-green-500/20' 
+                                        : 'border-[--color-border] bg-[--color-background-panel] opacity-70 hover:opacity-100';
+
+                                    return `
+                                        <button onclick="applyItemPreset(${idx})" 
+                                                class="flex-shrink-0 px-4 py-2 border rounded-lg hover:border-[--color-accent] transition-all text-left min-w-[150px] ${activeClasses}">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <div class="text-[10px] font-bold ${isActive ? 'text-green-500' : 'text-[--color-accent]'}">${preset.name}</div>
+                                                ${isActive ? '<i data-lucide="check-circle-2" class="w-3 h-3 text-green-500"></i>' : '<i data-lucide="plus" class="w-3 h-3 text-[--color-subtle]"></i>'}
+                                            </div>
+                                            <div class="text-[9px] leading-tight text-[--color-subtle]">
+                                                ${isActive ? 'Click to remove preset' : preset.disallowedItems.length + ' Items'}
+                                            </div>
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
                         <input type="text" placeholder="Search items..." class="cla-step-input w-full mb-4 px-4" oninput="filterItems(this.value)">
                         <div id="items-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                             ${Object.entries(itemsData).map(([name, ids]) => {
