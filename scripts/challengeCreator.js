@@ -21,7 +21,9 @@ const modifierDefinitions = [
     { key: 'noCampfireHealAndMorale', label: 'No Campfire Heal/Morale', default: false, tooltip: "If true, you cannot heal or gain morale from campfires." },
     { key: 'temporaryStatusesDecay', label: 'Temporary Statuses Decay', default: true, tooltip: "If true, statuses like cold, heat, and poison will decay normally." },
     { key: 'cannotSeeStaminaBar', label: 'Cannot see stamina bar', default: false, tooltip: "If true, you have the mushroom effect on your stamina bar where you casnnot see your stamina bar (Numbness)" },
-    { key: 'alwaysNearSighted', label: 'Always Near Sighted', default: false, tooltip: "If true, you will always be near sighted. Good look finding a path being basically blind!" }
+    { key: 'alwaysNearSighted', label: 'Always Near Sighted', default: false, tooltip: "If true, you will always be near sighted. Good look finding a path being basically blind!" },
+    { key: 'disableHunger', label: 'Disable Hunger', default: false, tooltip: "If true, you will no longer gain hunger, meant to be paired with crab."},
+    { key: 'crab', label: '97.5% Crab', default: false, tooltip: "If true, the player will get 97.5% of their stamina bar filled with crab status, which is a hidden base game status."}
 ];
 
 const itemPresets = [
