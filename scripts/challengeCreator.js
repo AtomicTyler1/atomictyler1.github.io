@@ -436,68 +436,264 @@ function clearPresetConfig() {
 async function exportAsShortcode() {
     const jsonConfig = getMinimalConfig(currentChallenge);
     
-    const btn = document.getElementById('shortcode-btn');
-    const resultDiv = document.getElementById('shortcode-result');
-    const display = document.getElementById('shortcode-display');
-
-    if(jsonConfig.Name.trim() === "" || jsonConfig.Creators.trim() === "") {
-        alert("Please provide a name/or creators for your challenge.");
+    if (jsonConfig.Name?.trim() === "" || jsonConfig.Creators?.trim() === "") {
+        showMessage("Please provide a Name and Creators for your challenge.", true);
         return;
     }
     
-    if(btn) btn.innerText = "Generating...";
-
-    try {
-        const msgUint8 = new TextEncoder().encode(JSON.stringify(jsonConfig));
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-        const { data: existing } = await supabaseClient
-            .from('challenges')
-            .select('id')
-            .eq('content_hash', hashHex)
-            .single();
-
-        let finalId = "";
-
-        if (existing) {
-            finalId = existing.id;
-        } else {
-            const shortId = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const { error } = await supabaseClient
-                .from('challenges')
-                .insert([{ id: shortId, config: jsonConfig, content_hash: hashHex }]);
-            
-            if (error) throw error;
-            finalId = shortId;
-        }
-
-        const fullCode = "CHALLENGE_" + finalId;
-        
-        if (resultDiv && display) {
-            resultDiv.classList.remove('hidden');
-            display.innerText = fullCode;
-        } else {
-            alert("Your code is: " + fullCode);
-        }
-
-        if(btn) btn.innerText = "Get Shortcode";
-        
-        navigator.clipboard.writeText(fullCode);
-
-    } catch (e) {
-        console.error("Shortener Error:", e);
-        alert("Failed to generate code. Plesae give your JSON to @atomictyler on discord.");
-        if(btn) btn.innerText = "Get Shortcode";
-    }
+    showPasswordModal('create');
 }
 
+async function updateExistingShortcode() {
+    const shortcodeInput = prompt("Enter the shortcode to update (e.g., ABC123 or CHALLENGE_ABC123):");
+    if (!shortcodeInput) return;
+    
+    let cleanId = shortcodeInput.replace(/^CHALLENGE_/i, '').toUpperCase();
+    if (!cleanId) {
+        showMessage("Invalid shortcode format", true);
+        return;
+    }
+    
+    const jsonConfig = getMinimalConfig(currentChallenge);
+    if (!jsonConfig.Name || !jsonConfig.Creators) {
+        showMessage("Challenge requires Name and Creators before updating", true);
+        return;
+    }
+    
+    showPasswordModal('update', cleanId);
+}
+
+function formatErrorMessage(error) {
+    if (!error) return "Unknown error occurred";
+
+    if (error.message) {
+        return error.message;
+    }
+    return JSON.stringify(error);
+}
+
+function showMessage(message, isError = false) {
+    const existingToast = document.querySelector('.custom-toast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = `custom-toast fixed bottom-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
+        isError ? 'bg-red-500/90 text-white' : 'bg-green-500/90 text-white'
+    } transition-all duration-300`;
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+function showPasswordModal(action, shortcode = null, onComplete) {
+    const modal = document.createElement('div');
+    modal.className = "fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200";
+    
+    const isCreate = action === 'create';
+    const isUpdate = action === 'update';
+    const isDelete = action === 'delete';
+    
+    let title = "Set Password";
+    let description = "Protect your shortcode with a password. You'll need it to update or delete later.";
+    if (isUpdate) {
+        title = "Update Challenge";
+        description = `Enter the password for shortcode: ${shortcode}`;
+    }
+    if (isDelete) {
+        title = "Delete Challenge";
+        description = `Warning: This will permanently delete "${shortcode}". Enter the password to confirm.`;
+    }
+    
+    modal.innerHTML = `
+        <div class="bg-[--color-background-panel] border border-[--color-border] rounded-2xl p-6 max-w-md w-full shadow-2xl scale-in-center">
+            <div class="text-center mb-5">
+                <div class="w-14 h-14 ${isDelete ? 'bg-red-500/20' : 'bg-[--color-accent]/10'} rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="${isDelete ? 'trash-2' : 'lock'}" class="w-7 h-7 ${isDelete ? 'text-red-500' : 'text-[--color-accent]'}"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">${title}</h3>
+                <p class="text-xs text-[--color-subtle] mt-2">${description}</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="password" id="modal-password" placeholder="Password" class="cla-step-input w-full" autocomplete="off">
+                ${isCreate ? `<input type="text" id="custom-shortcode" placeholder="Custom shortcode (optional, leave blank for random)" class="cla-step-input w-full mt-3">` : ''}
+                
+                <div class="flex gap-3 pt-2">
+                    <button id="modal-confirm" class="flex-1 ${isDelete ? 'bg-red-500 hover:bg-red-600' : 'bg-[--color-accent] hover:bg-[--color-accent]/80'} text-white font-bold py-2.5 rounded-xl transition-all">
+                        ${isDelete ? 'Delete Permanently' : (isCreate ? 'Create' : 'Confirm')}
+                    </button>
+                    <button id="modal-cancel" class="flex-1 bg-[--color-border] hover:bg-[--color-border]/80 text-white font-bold py-2.5 rounded-xl transition-all">
+                        Cancel
+                    </button>
+                </div>
+                
+                <div id="modal-error" class="text-red-400 text-xs text-center hidden"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    lucide.createIcons();
+    
+    const confirmBtn = modal.querySelector('#modal-confirm');
+    const cancelBtn = modal.querySelector('#modal-cancel');
+    const passwordInput = modal.querySelector('#modal-password');
+    const errorDiv = modal.querySelector('#modal-error');
+    const customShortcode = modal.querySelector('#custom-shortcode');
+    
+    confirmBtn.onclick = async () => {
+        const password = passwordInput.value.trim();
+        if (!password) {
+            errorDiv.textContent = "Password is required";
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        errorDiv.classList.add('hidden');
+        
+        if (isCreate) {
+            let targetId = customShortcode?.value.trim().toUpperCase() || '';
+            if (!targetId) {
+                targetId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+            if (targetId.length < 3) {
+                errorDiv.textContent = "Shortcode must be at least 3 characters";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            const jsonConfig = getMinimalConfig(currentChallenge);
+            if (!jsonConfig.Name || !jsonConfig.Creators) {
+                errorDiv.textContent = "Please provide a Name and Creators for your challenge";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "Creating...";
+            
+            try {
+                const msgUint8 = new TextEncoder().encode(JSON.stringify(jsonConfig));
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+                const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                const { error } = await supabaseClient.rpc('create_challenge_with_password', {
+                    p_id: targetId,
+                    p_config: jsonConfig,
+                    p_password: password
+                });
+                
+                if (error) throw error;
+                
+                const fullCode = "CHALLENGE_" + targetId;
+                const resultDiv = document.getElementById('shortcode-result');
+                const display = document.getElementById('shortcode-display');
+                if (resultDiv && display) {
+                    resultDiv.classList.remove('hidden');
+                    display.innerText = fullCode;
+                }
+                navigator.clipboard.writeText(fullCode);
+                showMessage(`✅ Created! Code: ${fullCode} (password protected)`);
+                modal.remove();
+                if (onComplete) onComplete(targetId);
+            } catch (err) {
+                errorDiv.textContent = formatErrorMessage(err);
+                errorDiv.classList.remove('hidden');
+                console.error("Create error:", err);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Create";
+            }
+        }
+        
+        else if (isUpdate) {
+            const jsonConfig = getMinimalConfig(currentChallenge);
+            if (!jsonConfig.Name || !jsonConfig.Creators) {
+                errorDiv.textContent = "Challenge requires Name and Creators";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "Updating...";
+            
+            try {
+                const { error } = await supabaseClient.rpc('update_challenge_with_password', {
+                    p_id: shortcode,
+                    p_config: jsonConfig,
+                    p_password: password
+                });
+                
+                if (error) throw error;
+                
+                showMessage(`✅ Challenge "${shortcode}" updated successfully!`);
+                modal.remove();
+                if (onComplete) onComplete();
+            } catch (err) {
+                errorDiv.textContent = formatErrorMessage(err);
+                errorDiv.classList.remove('hidden');
+                console.error("Update error:", err);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Confirm";
+            }
+        }
+        
+        else if (isDelete) {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "Deleting...";
+            
+            try {
+                const { error } = await supabaseClient.rpc('delete_challenge_with_password', {
+                    p_id: shortcode,
+                    p_password: password
+                });
+                
+                if (error) throw error;
+                
+                showMessage(`🗑️ Challenge "${shortcode}" deleted successfully`);
+                modal.remove();
+                if (onComplete) onComplete();
+            } catch (err) {
+                errorDiv.textContent = formatErrorMessage(err);
+                errorDiv.classList.remove('hidden');
+                console.error("Delete error:", err);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Delete Permanently";
+            }
+        }
+    };
+    
+    cancelBtn.onclick = () => modal.remove();
+    
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') confirmBtn.click();
+    });
+}
+
+async function deleteShortcode() {
+    const shortcodeInput = prompt("Enter the shortcode to DELETE (this cannot be undone):");
+    if (!shortcodeInput) return;
+    
+    let cleanId = shortcodeInput.replace(/^CHALLENGE_/i, '').toUpperCase();
+    if (!cleanId) {
+        showMessage("Invalid shortcode format", true);
+        return;
+    }
+    
+    showPasswordModal('delete', cleanId);
+}
 async function importConfig() {
     const area = document.getElementById('import-json-area');
     const input = area.value.trim();
 
     if (!input) {
-        alert("Please paste a JSON configuration or a Challenge Code.");
+        showMessage("Please paste a JSON configuration or a Challenge Code.", true);
         return;
     }
 
@@ -514,12 +710,18 @@ async function importConfig() {
                 .eq('id', shortId)
                 .single();
 
-            if (error || !data) throw new Error("Challenge not found.");
+            if (error) {
+                if (error.code === "PGRST116") {
+                    throw new Error("Challenge not found. The code may be invalid.");
+                }
+                throw error;
+            }
+            if (!data) throw new Error("Challenge not found.");
 
             applyImportedConfig(data.config);
-            alert(`Challenge '${data.config.Name}' loaded via code!`);
+            showMessage(`✅ Loaded challenge '${data.config.Name || shortId}' from code!`);
         } catch (e) {
-            alert("Error: " + e.message);
+            showMessage(formatErrorMessage(e), true);
             area.placeholder = "Paste JSON or CHALLENGE_CODE here...";
         }
         return;
@@ -529,10 +731,10 @@ async function importConfig() {
         const imported = JSON.parse(input);
         applyImportedConfig(imported);
         area.value = "";
-        alert("JSON configuration loaded successfully!");
+        showMessage("✅ JSON configuration loaded successfully!");
     } catch (e) {
         console.error("Import Error:", e);
-        alert("Invalid format. Please paste a valid JSON or a CHALLENGE_ code.");
+        showMessage("Invalid format. Please paste a valid JSON or a CHALLENGE_ code.", true);
     }
 }
 
@@ -589,8 +791,8 @@ async function renderPeakPresetsPage() {
 
                     <div class="pt-6 border-t border-[--color-border] space-y-3">
                         <a href="https://thunderstore.io/c/peak/p/AtomicStudio/ChallengeCreator/" 
-                           target="_blank" 
-                           class="w-full bg-orange-600/10 text-orange-500 border border-orange-600/30 font-bold py-2 rounded-xl hover:bg-orange-600/20 transition flex items-center justify-center text-xs">
+                        target="_blank" 
+                        class="w-full bg-orange-600/10 text-orange-500 border border-orange-600/30 font-bold py-2 rounded-xl hover:bg-orange-600/20 transition flex items-center justify-center text-xs">
                             <i data-lucide="external-link" class="w-3 h-3 mr-2"></i> View on Thunderstore
                         </a>
 
@@ -599,7 +801,15 @@ async function renderPeakPresetsPage() {
                         </button>
                         
                         <button id="shortcode-btn" onclick="exportAsShortcode()" class="w-full bg-[--color-accent] text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition">
-                            <i data-lucide="share-2" class="w-4 h-4 inline mr-2"></i> Get Shortcode
+                            <i data-lucide="share-2" class="w-4 h-4 inline mr-2"></i> Create Shortcode (Password)
+                        </button>
+                        
+                        <button onclick="updateExistingShortcode()" class="w-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold py-3 rounded-xl hover:bg-blue-600/30 transition">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2"></i> Update Shortcode
+                        </button>
+                        
+                        <button onclick="deleteShortcode()" class="w-full bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-3 rounded-xl hover:bg-red-500/30 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4 inline mr-2"></i> Delete Shortcode
                         </button>
                         
                         <div id="shortcode-result" class="hidden animate-pulse text-center p-3 bg-green-500/10 border border-green-500/50 rounded-lg">
