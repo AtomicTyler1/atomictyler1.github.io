@@ -466,6 +466,10 @@ async function updateExistingShortcode() {
 function formatErrorMessage(error) {
     if (!error) return "Unknown error occurred";
 
+    if (error.message == "canceling statement due to statement timeout") {
+        return "Try again later or try a different password."
+    }
+
     if (error.message) {
         return error.message;
     }
