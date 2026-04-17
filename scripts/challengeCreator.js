@@ -23,7 +23,8 @@ const modifierDefinitions = [
     { key: 'cannotSeeStaminaBar', label: 'Cannot see stamina bar', default: false, tooltip: "If true, you have the mushroom effect on your stamina bar where you casnnot see your stamina bar (Numbness)" },
     { key: 'alwaysNearSighted', label: 'Always Near Sighted', default: false, tooltip: "If true, you will always be near sighted. Good look finding a path being basically blind!" },
     { key: 'disableHunger', label: 'Disable Hunger', default: false, tooltip: "If true, you will no longer gain hunger, meant to be paired with crab."},
-    { key: 'crab', label: '97.5% Crab', default: false, tooltip: "If true, the player will get 97.5% of their stamina bar filled with crab status, which is a hidden base game status."}
+    { key: 'crab', label: '97.5% Crab', default: false, tooltip: "If true, the player will get 97.5% of their stamina bar filled with crab status, which is a hidden base game status."},
+    { key: 'pandoraFires', label: 'Pandora Fires', default: false, tooltip: "If true, the player will get random afflictions (pandora's lunchbox) along with a random 0%->10% curse amount added ontop."}
 ];
 
 const itemPresets = [
