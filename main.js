@@ -1,13 +1,14 @@
-// main.js - Core application logic
-
-// Global variables and state
 let MOD_STATS = { total_downloads: 0, total_ratings: 0, last_checked: 0 };
 let ALL_MODS = [];
 let GITHUB_REPOS = [];
+let COMMUNITIES_DATA = [];
+let TOTAL_MEMBERS_MODERATED = 0;
 
 const GIST_API_URL = 'https://api.github.com/gists/913a40238b453d557cb1073fd4c05a83';
 const GIST_FILE_NAME = 'prev.json';
 const GITHUB_API_URL = 'https://api.github.com/users/AtomicTyler1/repos';
+
+const DISCORD_STATS_API_URL = 'https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/27076ec4052110f5fb12fb85558cc92c6c16e5b3/servers.json';
 
 const CACHE_KEY_MODS = 'atomic_mod_data_cache_v3';
 const CACHE_KEY_GITHUB = 'atomic_github_repos_cache_v3';
@@ -41,6 +42,34 @@ function initializeTheme() {
         document.body.classList.remove('dark');
     }
     updateThemeIcons();
+}
+
+async function fetchDiscordCommunities() {
+    try {
+        const response = await fetch(DISCORD_STATS_API_URL);
+        const data = await response.json();
+
+        if (data && data.servers) {
+            COMMUNITIES_DATA = Object.entries(data.servers).map(([id, server]) => ({
+                id: id,
+                display: server.Name,
+                status: server.status,
+                invite: server.Invite,
+                favourite: server.favourited,
+                members: server.Members,
+                image: server.Icon,
+                description: server.description,
+                website: server.external_link || null,
+                addToTotal: server.add_to_total
+            }));
+
+            TOTAL_MEMBERS_MODERATED = COMMUNITIES_DATA
+                .filter(c => c.addToTotal)
+                .reduce((acc, curr) => acc + curr.members, 0);
+        }
+    } catch (err) {
+        console.error("Failed to fetch dynamic Discord community data:", err);
+    }
 }
 
 function toggleTheme() {
@@ -240,7 +269,7 @@ function renderHomePage() {
             </div>
         </div>
 
-        <section id="mod-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 text-center">
+        <section id="mod-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 text-center">
             <div class="panel-block p-6">
                 <i data-lucide="download-cloud" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
                 <p class="text-3xl font-bold text-[--color-text-main]" id="total-downloads">...</p>
@@ -255,6 +284,11 @@ function renderHomePage() {
                 <i data-lucide="puzzle" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
                  <p class="text-3xl font-bold text-[--color-text-main]" id="total-mods-count">...</p>
                 <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Mods Available</p>
+            </div>
+            <div class="panel-block p-6">
+                <i data-lucide="users" class="w-8 h-8 text-[--color-accent] mx-auto mb-3"></i>
+                 <p class="text-3xl font-bold text-[--color-text-main]" id="total-members-moderated">...</p>
+                <p class="text-sm text-[--color-subtle] uppercase tracking-wider mt-1">Members Moderated</p>
             </div>
         </section>
         
@@ -274,10 +308,12 @@ function updateHomePageStats() {
     const downloadEl = document.getElementById('total-downloads');
     const ratingEl = document.getElementById('total-ratings');
     const modsEl = document.getElementById('total-mods-count');
+    const moderatedEl = document.getElementById('total-members-moderated');
 
     if (downloadEl) downloadEl.textContent = formatNumber(MOD_STATS?.total_downloads ?? 0);
     if (ratingEl) ratingEl.textContent = formatNumber(MOD_STATS?.total_ratings ?? 0);
     if (modsEl) modsEl.textContent = (ALL_MODS?.length ?? 0);
+    if (moderatedEl) moderatedEl.textContent = formatNumber(TOTAL_MEMBERS_MODERATED ?? 0);
 
     lucide.createIcons();
 }
@@ -555,7 +591,8 @@ async function initializeApp() {
 
     await Promise.all([
         fetchModData(),
-        fetchGithubRepos()
+        fetchGithubRepos(),
+        fetchDiscordCommunities()
     ]);
 
     refreshDataViews();
@@ -613,8 +650,11 @@ window.onload = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
     initializeTheme();
-    await fetchModData();
-    await fetchGithubRepos();
+    await Promise.all([
+        fetchModData(),
+        fetchGithubRepos(),
+        fetchDiscordCommunities()
+    ]);
     navigate(window.location.hash.replace("#", "") || "home");
     refreshDataViews();
     lucide.createIcons();

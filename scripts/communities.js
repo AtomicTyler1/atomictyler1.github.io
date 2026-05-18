@@ -1,16 +1,12 @@
-const COMMUNITIES_DATA = [
-    { id: 'peak-modding', display: 'PEAK Modding Community', join: '19 April 2025', status: 'Server Owner', invite: 'discord.gg/SAw86z24rB', favourite: true, members: '6,000+', image: 'https://cdn.discordapp.com/icons/1363179626435707082/c72c47d04c782b0a405b024fae6335a8.webp', description: 'The official modding community, partnered with Thunderstore for PEAK.', website: 'https://peakmodding.github.io/' },
-    { id: 'peak', display: 'Official PEAK Discord', join: '17 June 2025', status: 'Moderator', invite: 'discord.gg/peakgame', favourite: true, members: '488,000+', image: 'https://cdn.discordapp.com/icons/1368870708335083650/9547ab960b4e3337ae6f608a63aab45e.webp', description: 'The official discord for PEAK by Landcrab (Landfall & Aggro Crab)', website: 'https://peakpeakpeak.com/' },
-    { id: 'lethal-company-modding', display: 'Lethal Company Modding', join: '6 August 2024', status: 'Senior Server Staff', invite: 'discord.gg/XeyYqRdRGC', favourite: true, members: '37,700+', image: 'https://cdn.discordapp.com/icons/1168655651455639582/a_a1f853e2ebb09bbaa428648109eca048.webp', description: 'The first modding community I joined and modded in!', website: 'https://lethal.wiki/' },
-    { id: 'atomics-lab', display: 'Atomic\'s Lab', join: '12 September 2025', status: 'Server Owner', invite: 'discord.gg/PGf9aa9n2t', favourite: false, members: '14+', image: 'https://cdn.discordapp.com/icons/1416132317243510906/6ad870513c1985845888086dff36707c.webp', description: 'A hub for my personal projects and developments.', website: 'https://atomictyler.dev/' },
-    { id: 'content-warning-mods', display: 'Content Warning Mods', join: '19 September 2024', status: 'Modder', invite: 'discord.gg/yeGDSm4gFq', favourite: false, members: '14,900+', image: 'https://cdn.discordapp.com/icons/1224455971057958954/bd4d57e5aae0cc746e643a9b427b2a4e.webp', description: 'Official community for Content Warning Mods, by Landfall.' },
-    { id: 'repo', display: 'R.E.P.O. Modding Community', join: '17 April 2025', status: 'Moderator', invite: 'discord.gg/vPJtKhYAFe', favourite: false, members: '15,300+', image: 'https://cdn.discordapp.com/icons/1344557689979670578/55ee5d529af2ce487eb9b1d0b6d9d49f.webp', description: 'Modding Community for R.E.P.O.' },
-    { id: 'thunderstore', display: 'Thunderstore', join: '12 November 2024', status: 'Community Moderator', invite: 'discord.gg/UWpWhjZken', favourite: false, members: '11,200+', image: 'https://cdn.discordapp.com/icons/809128887366975518/b3e3ff21e74318f6c1fc734286e8ac76.webp', description: 'Popular mod hosting site.', website: 'https://thunderstore.io/' },
-    { id: 'yapyap', display: 'YAPYAP Modding', join: '4 Februrary 2026', status: 'Server Owner', invite: 'discord.gg/kzKBmD8HrB', favourite: false, members: '90+', image: 'https://cdn.discordapp.com/icons/1468700116104908884/77fdc52c94bb988b57d420a74214022a.webp', description: 'A small modding community for YAPYAP.', website: 'https://store.steampowered.com/app/3834090/YAPYAP/' },
-    { id: 'super-battle-golf', display: 'Super Battle Golf Modding', join: '24 Februrary 2026', status: 'Server Owner', invite: 'discord.gg/CCcvS2JDjH', favourite: false, members: '112+', image: 'https://cdn.discordapp.com/icons/1475881044795199550/1b260c299d07ec7596e62d8a14872927.webp', description: 'The modding community for SBG with a whole lot of devs.', website: 'https://store.steampowered.com/app/4069520/Super_Battle_Golf/' },
-];
-
 function renderCommunitiesPage() {
+    if (!COMMUNITIES_DATA || COMMUNITIES_DATA.length === 0) {
+        contentDiv.innerHTML = `
+            <div class="page-transition text-center py-12">
+                <p class="text-xl italic text-[--color-subtle]">Syncing Live Discord Communities...</p>
+            </div>`;
+        return;
+    }
+
     const communityCardTemplate = (community) => {
         const isFavourite = community.favourite ? '<span class="absolute top-4 left-4 text-yellow-500"><i data-lucide="star" class="w-5 h-5 fill-current"></i></span>' : '';
 
@@ -19,6 +15,8 @@ function renderCommunitiesPage() {
                 <i data-lucide="globe" class="w-5 h-5"></i>
             </a>
         ` : '';
+
+        const displayMembers = typeof community.members === 'number' ? formatNumber(community.members) : community.members;
 
         return `
             <div class="panel-block p-6 flex flex-col justify-between h-full relative overflow-hidden">
@@ -36,8 +34,7 @@ function renderCommunitiesPage() {
                 <p class="text-sm text-[--color-text-main] mb-4 flex-grow">${community.description}</p>
                 
                 <div class="text-xs text-[--color-subtle] mb-4 border-t border-[--color-border] pt-3">
-                    <p>Joined: ${community.join}</p>
-                    <p>Members: ${community.members}</p>
+                    <p>Members: ${displayMembers}</p>
                 </div>
 
                 <button onclick="window.open('https://${community.invite}', '_blank')" class="mt-4 w-full bg-[--color-accent] text-white py-2 rounded-lg font-bold hover:opacity-80 transition duration-300 shadow-md shadow-[--color-shadow-base]">
