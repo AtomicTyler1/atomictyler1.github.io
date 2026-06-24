@@ -6,13 +6,12 @@ let TOTAL_MEMBERS_MODERATED = 0;
 
 const GIST_API_URL = 'https://api.github.com/gists/913a40238b453d557cb1073fd4c05a83';
 const GIST_FILE_NAME = 'prev.json';
+const SERVERS_FILE_NAME = 'servers.json';
 const GITHUB_API_URL = 'https://api.github.com/users/AtomicTyler1/repos';
 
-const DISCORD_STATS_API_URL = 'https://gist.githubusercontent.com/AtomicTyler1/913a40238b453d557cb1073fd4c05a83/raw/27076ec4052110f5fb12fb85558cc92c6c16e5b3/servers.json';
-
-const CACHE_KEY_MODS = 'atomic_mod_data_cache_v3';
-const CACHE_KEY_GITHUB = 'atomic_github_repos_cache_v3';
-const CACHE_KEY_THEME = 'atomic_theme_preference_v3';
+const CACHE_KEY_GITHUB = 'atomic_github_repos_cache';
+const CACHE_KEY_THEME = 'atomic_theme_preference';
+const CACHE_KEY_MODS = 'atomic_mods_cache';
 const CACHE_EXPIRY_MS = 3600000;
 const MOD_CACHE_EXPIRY_MS = 3600000 * 4;
 
@@ -24,14 +23,11 @@ const APP_STATE = {
     isMobileMenuOpen: false,
 };
 
-// DOM Elements
 const contentDiv = document.getElementById('content');
 const appContainer = document.getElementById('app');
 
-// Utility Functions
 const formatNumber = (num) => new Intl.NumberFormat('en-US').format(num);
 
-// Theme Management
 function initializeTheme() {
     const savedTheme = localStorage.getItem(CACHE_KEY_THEME);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -42,34 +38,6 @@ function initializeTheme() {
         document.body.classList.remove('dark');
     }
     updateThemeIcons();
-}
-
-async function fetchDiscordCommunities() {
-    try {
-        const response = await fetch(DISCORD_STATS_API_URL);
-        const data = await response.json();
-
-        if (data && data.servers) {
-            COMMUNITIES_DATA = Object.entries(data.servers).map(([id, server]) => ({
-                id: id,
-                display: server.Name,
-                status: server.status,
-                invite: server.Invite,
-                favourite: server.favourited,
-                members: server.Members,
-                image: server.Icon,
-                description: server.description,
-                website: server.external_link || null,
-                addToTotal: server.add_to_total
-            }));
-
-            TOTAL_MEMBERS_MODERATED = COMMUNITIES_DATA
-                .filter(c => c.addToTotal)
-                .reduce((acc, curr) => acc + curr.members, 0);
-        }
-    } catch (err) {
-        console.error("Failed to fetch dynamic Discord community data:", err);
-    }
 }
 
 function toggleTheme() {
@@ -89,7 +57,6 @@ function updateThemeIcons() {
     lucide.createIcons();
 }
 
-// Mobile Menu
 function toggleMobileMenu() {
     APP_STATE.isMobileMenuOpen = !APP_STATE.isMobileMenuOpen;
     const menuEl = document.getElementById('mobile-menu');
@@ -117,7 +84,6 @@ function toggleMobileMenu() {
     lucide.createIcons();
 }
 
-// Navigation
 function navigate(page) {
     APP_STATE.currentPage = page;
 
@@ -163,7 +129,6 @@ function navigate(page) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Message Display
 function showMessage(id, message, colorClass) {
     const el = document.getElementById(id);
     if (el) {
@@ -178,14 +143,27 @@ function showMessage(id, message, colorClass) {
     }
 }
 
-// Data Fetching
 async function fetchModData() {
     try {
         const response = await fetch(GIST_API_URL);
+        if (!response.ok) {
+            throw new Error(`Gist API responded with status: ${response.status}`);
+        }
         const gist = await response.json();
 
-        if (!gist.files || !gist.files[GIST_FILE_NAME]) {
-            console.error("prev.json not found in Gist");
+        if (!gist.files) {
+            console.error("No files found in Gist payload");
+            return;
+        }
+
+        if (gist.files[SERVERS_FILE_NAME]) {
+            discordStatsApiUrl = gist.files[SERVERS_FILE_NAME].raw_url;
+        } else {
+            console.warn(`${SERVERS_FILE_NAME} not found in Gist payload, falling back to cached or default behaviors.`);
+        }
+
+        if (!gist.files[GIST_FILE_NAME]) {
+            console.error(`${GIST_FILE_NAME} not found in Gist`);
             return;
         }
 
@@ -201,7 +179,6 @@ async function fetchModData() {
             .filter(([k, v]) => v && v.downloads !== undefined)
             .map(([key, modData]) => {
                 const isSteam = modData.platform === 'Steam';
-                
                 return {
                     name: key,
                     author: isSteam ? "Atomic();" : "AtomicStudio",
@@ -216,6 +193,44 @@ async function fetchModData() {
         }));
     } catch (err) {
         console.error("Failed to fetch mod data:", err);
+    }
+}
+
+async function fetchDiscordCommunities() {
+    if (!discordStatsApiUrl) {
+        console.error("Cannot fetch Discord communities: URL has not been resolved from Gist API.");
+        return;
+    }
+
+    try {
+        const response = await fetch(discordStatsApiUrl);
+        if (!response.ok) {
+            throw new Error(`Discord stats responded with status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        console.log("Successfully fetched Discord community data:", data);
+
+        if (data && data.servers) {
+            COMMUNITIES_DATA = Object.entries(data.servers).map(([id, server]) => ({
+                id: id,
+                display: server.Name,
+                status: server.status,
+                invite: server.Invite,
+                favourite: server.favourited,
+                members: server.Members,
+                image: server.Icon,
+                description: server.description,
+                website: server.external_link || null,
+                addToTotal: server.add_to_total
+            }));
+
+            TOTAL_MEMBERS_MODERATED = COMMUNITIES_DATA
+                .filter(c => c.addToTotal)
+                .reduce((acc, curr) => acc + curr.members, 0);
+        }
+    } catch (err) {
+        console.error("Failed to fetch Discord community data:", err);
     }
 }
 
@@ -589,8 +604,9 @@ async function initializeApp() {
         navigate('home');
     }
 
+    await fetchModData();
+    
     await Promise.all([
-        fetchModData(),
         fetchGithubRepos(),
         fetchDiscordCommunities()
     ]);
@@ -650,11 +666,14 @@ window.onload = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
     initializeTheme();
+    
+    await fetchModData();
+    
     await Promise.all([
-        fetchModData(),
         fetchGithubRepos(),
         fetchDiscordCommunities()
     ]);
+    
     navigate(window.location.hash.replace("#", "") || "home");
     refreshDataViews();
     lucide.createIcons();
